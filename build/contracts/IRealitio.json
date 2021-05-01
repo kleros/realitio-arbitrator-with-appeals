@@ -1,0 +1,809 @@
+{
+  "contractName": "IRealitio",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "question_id",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "requester",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "max_previous",
+          "type": "uint256"
+        }
+      ],
+      "name": "notifyOfArbitrationRequest",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "question_id",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "answer",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "payee_if_wrong",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "last_history_hash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "last_answer_or_commitment_id",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "last_answerer",
+          "type": "address"
+        }
+      ],
+      "name": "assignWinnerAndSubmitAnswerByArbitrator",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"question_id\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"answer\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"payee_if_wrong\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"last_history_hash\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"last_answer_or_commitment_id\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"last_answerer\",\"type\":\"address\"}],\"name\":\"assignWinnerAndSubmitAnswerByArbitrator\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"question_id\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"requester\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"max_previous\",\"type\":\"uint256\"}],\"name\":\"notifyOfArbitrationRequest\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Required subset of https://github.com/realitio/realitio-contracts/blob/master/truffle/contracts/IRealitio.sol to implement a Realitio arbitrator.\",\"kind\":\"dev\",\"methods\":{},\"title\":\"IRealitio\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/home/f/repos/realitio-arbitrator-with-appeals/contracts/Realitio/IRealitio.sol\":\"IRealitio\"},\"evmVersion\":\"byzantium\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":20000},\"remappings\":[]},\"sources\":{\"/home/f/repos/realitio-arbitrator-with-appeals/contracts/Realitio/IRealitio.sol\":{\"keccak256\":\"0x0a6bd40e5248fb2201684e6d053042f2e8107384f8d1851b2b194e7e0550fd27\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d73e08ea496cc142d448f4abfac48c9af0fb5ad6fb5aba1baa413dcb250e4971\",\"dweb:/ipfs/QmYReBiQPWJX38pLXnWDwCmWwAMtTDmQQgdHFtjN2RUTb4\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\n/**\n *  @authors: [@ferittuncer]\n *  @reviewers: []\n *  @auditors: []\n *  @bounties: []\n *  @deployments: []\n */\n\npragma solidity ^0.7.6;\n\n/**\n *  @title IRealitio\n *  @dev Required subset of https://github.com/realitio/realitio-contracts/blob/master/truffle/contracts/IRealitio.sol to implement a Realitio arbitrator.\n */\ninterface IRealitio {\n    function notifyOfArbitrationRequest(\n        bytes32 question_id,\n        address requester,\n        uint256 max_previous\n    ) external;\n\n    function assignWinnerAndSubmitAnswerByArbitrator(\n        bytes32 question_id,\n        bytes32 answer,\n        address payee_if_wrong,\n        bytes32 last_history_hash,\n        bytes32 last_answer_or_commitment_id,\n        address last_answerer\n    ) external;\n}\n",
+  "sourcePath": "/home/f/repos/realitio-arbitrator-with-appeals/contracts/Realitio/IRealitio.sol",
+  "ast": {
+    "absolutePath": "/home/f/repos/realitio-arbitrator-with-appeals/contracts/Realitio/IRealitio.sol",
+    "exportedSymbols": {
+      "IRealitio": [
+        752
+      ]
+    },
+    "id": 753,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 726,
+        "literals": [
+          "solidity",
+          "^",
+          "0.7",
+          ".6"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "147:23:3"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 727,
+          "nodeType": "StructuredDocumentation",
+          "src": "172:183:3",
+          "text": "  @title IRealitio\n  @dev Required subset of https://github.com/realitio/realitio-contracts/blob/master/truffle/contracts/IRealitio.sol to implement a Realitio arbitrator."
+        },
+        "fullyImplemented": false,
+        "id": 752,
+        "linearizedBaseContracts": [
+          752
+        ],
+        "name": "IRealitio",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "f6a94ecb",
+            "id": 736,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "notifyOfArbitrationRequest",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 734,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 729,
+                  "mutability": "mutable",
+                  "name": "question_id",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 736,
+                  "src": "427:19:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 728,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "427:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 731,
+                  "mutability": "mutable",
+                  "name": "requester",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 736,
+                  "src": "456:17:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 730,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "456:7:3",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 733,
+                  "mutability": "mutable",
+                  "name": "max_previous",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 736,
+                  "src": "483:20:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 732,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "483:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "417:92:3"
+            },
+            "returnParameters": {
+              "id": 735,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "518:0:3"
+            },
+            "scope": 752,
+            "src": "382:137:3",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "d44e293c",
+            "id": 751,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "assignWinnerAndSubmitAnswerByArbitrator",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 749,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 738,
+                  "mutability": "mutable",
+                  "name": "question_id",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 751,
+                  "src": "583:19:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 737,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "583:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 740,
+                  "mutability": "mutable",
+                  "name": "answer",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 751,
+                  "src": "612:14:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 739,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "612:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 742,
+                  "mutability": "mutable",
+                  "name": "payee_if_wrong",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 751,
+                  "src": "636:22:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 741,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "636:7:3",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 744,
+                  "mutability": "mutable",
+                  "name": "last_history_hash",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 751,
+                  "src": "668:25:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 743,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "668:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 746,
+                  "mutability": "mutable",
+                  "name": "last_answer_or_commitment_id",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 751,
+                  "src": "703:36:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 745,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "703:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 748,
+                  "mutability": "mutable",
+                  "name": "last_answerer",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 751,
+                  "src": "749:21:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 747,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "749:7:3",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "573:203:3"
+            },
+            "returnParameters": {
+              "id": 750,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "785:0:3"
+            },
+            "scope": 752,
+            "src": "525:261:3",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 753,
+        "src": "356:432:3"
+      }
+    ],
+    "src": "147:642:3"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/home/f/repos/realitio-arbitrator-with-appeals/contracts/Realitio/IRealitio.sol",
+      "exportedSymbols": {
+        "IRealitio": [
+          752
+        ]
+      },
+      "license": "MIT"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.7",
+            ".6"
+          ]
+        },
+        "id": 726,
+        "name": "PragmaDirective",
+        "src": "147:23:3"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "interface",
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            752
+          ],
+          "name": "IRealitio",
+          "scope": 753
+        },
+        "children": [
+          {
+            "attributes": {
+              "text": "  @title IRealitio\n  @dev Required subset of https://github.com/realitio/realitio-contracts/blob/master/truffle/contracts/IRealitio.sol to implement a Realitio arbitrator."
+            },
+            "id": 727,
+            "name": "StructuredDocumentation",
+            "src": "172:183:3"
+          },
+          {
+            "attributes": {
+              "functionSelector": "f6a94ecb",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "notifyOfArbitrationRequest",
+              "scope": 752,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "question_id",
+                      "scope": 736,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bytes32",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bytes32",
+                          "type": "bytes32"
+                        },
+                        "id": 728,
+                        "name": "ElementaryTypeName",
+                        "src": "427:7:3"
+                      }
+                    ],
+                    "id": 729,
+                    "name": "VariableDeclaration",
+                    "src": "427:19:3"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "requester",
+                      "scope": 736,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 730,
+                        "name": "ElementaryTypeName",
+                        "src": "456:7:3"
+                      }
+                    ],
+                    "id": 731,
+                    "name": "VariableDeclaration",
+                    "src": "456:17:3"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "max_previous",
+                      "scope": 736,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 732,
+                        "name": "ElementaryTypeName",
+                        "src": "483:7:3"
+                      }
+                    ],
+                    "id": 733,
+                    "name": "VariableDeclaration",
+                    "src": "483:20:3"
+                  }
+                ],
+                "id": 734,
+                "name": "ParameterList",
+                "src": "417:92:3"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 735,
+                "name": "ParameterList",
+                "src": "518:0:3"
+              }
+            ],
+            "id": 736,
+            "name": "FunctionDefinition",
+            "src": "382:137:3"
+          },
+          {
+            "attributes": {
+              "functionSelector": "d44e293c",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "assignWinnerAndSubmitAnswerByArbitrator",
+              "scope": 752,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "question_id",
+                      "scope": 751,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bytes32",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bytes32",
+                          "type": "bytes32"
+                        },
+                        "id": 737,
+                        "name": "ElementaryTypeName",
+                        "src": "583:7:3"
+                      }
+                    ],
+                    "id": 738,
+                    "name": "VariableDeclaration",
+                    "src": "583:19:3"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "answer",
+                      "scope": 751,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bytes32",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bytes32",
+                          "type": "bytes32"
+                        },
+                        "id": 739,
+                        "name": "ElementaryTypeName",
+                        "src": "612:7:3"
+                      }
+                    ],
+                    "id": 740,
+                    "name": "VariableDeclaration",
+                    "src": "612:14:3"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "payee_if_wrong",
+                      "scope": 751,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 741,
+                        "name": "ElementaryTypeName",
+                        "src": "636:7:3"
+                      }
+                    ],
+                    "id": 742,
+                    "name": "VariableDeclaration",
+                    "src": "636:22:3"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "last_history_hash",
+                      "scope": 751,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bytes32",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bytes32",
+                          "type": "bytes32"
+                        },
+                        "id": 743,
+                        "name": "ElementaryTypeName",
+                        "src": "668:7:3"
+                      }
+                    ],
+                    "id": 744,
+                    "name": "VariableDeclaration",
+                    "src": "668:25:3"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "last_answer_or_commitment_id",
+                      "scope": 751,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bytes32",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bytes32",
+                          "type": "bytes32"
+                        },
+                        "id": 745,
+                        "name": "ElementaryTypeName",
+                        "src": "703:7:3"
+                      }
+                    ],
+                    "id": 746,
+                    "name": "VariableDeclaration",
+                    "src": "703:36:3"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "last_answerer",
+                      "scope": 751,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 747,
+                        "name": "ElementaryTypeName",
+                        "src": "749:7:3"
+                      }
+                    ],
+                    "id": 748,
+                    "name": "VariableDeclaration",
+                    "src": "749:21:3"
+                  }
+                ],
+                "id": 749,
+                "name": "ParameterList",
+                "src": "573:203:3"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 750,
+                "name": "ParameterList",
+                "src": "785:0:3"
+              }
+            ],
+            "id": 751,
+            "name": "FunctionDefinition",
+            "src": "525:261:3"
+          }
+        ],
+        "id": 752,
+        "name": "ContractDefinition",
+        "src": "356:432:3"
+      }
+    ],
+    "id": 753,
+    "name": "SourceUnit",
+    "src": "147:642:3"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.7.6+commit.7338295f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.0",
+  "updatedAt": "2021-05-01T17:47:29.675Z",
+  "devdoc": {
+    "details": "Required subset of https://github.com/realitio/realitio-contracts/blob/master/truffle/contracts/IRealitio.sol to implement a Realitio arbitrator.",
+    "kind": "dev",
+    "methods": {},
+    "title": "IRealitio",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
