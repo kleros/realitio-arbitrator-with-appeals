@@ -17,7 +17,7 @@
     "prettier-plugin-solidity": "^1.0.0-beta.3",
     "surya": "^0.4.0",
     "truffle": "^5.1.17",
-    "truffle-plugin-verify": "^0.5.4"
+    "truffle-plugin-verify": "^0.5.7"
   },
   "dependencies": {
     "@kleros/dispute-resolver-interface-contract": "1.0.0",
