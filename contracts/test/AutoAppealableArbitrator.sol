@@ -45,7 +45,7 @@ contract AutoAppealableArbitrator is IArbitrator {
     /** @dev Constructor. Set the initial arbitration price.
      *  @param _arbitrationPrice Amount to be paid for arbitration.
      */
-    constructor(uint256 _arbitrationPrice) public {
+    constructor(uint256 _arbitrationPrice) {
         arbitrationPrice = _arbitrationPrice;
     }
 
@@ -99,7 +99,7 @@ contract AutoAppealableArbitrator is IArbitrator {
         dispute.ruling = _ruling;
         dispute.status = DisputeStatus.Solved;
 
-        msg.sender.send(dispute.fees); // Avoid blocking.
+        msg.sender.transfer(dispute.fees);
         dispute.arbitrated.rule(_disputeID, _ruling);
     }
 
@@ -166,7 +166,7 @@ contract AutoAppealableArbitrator is IArbitrator {
         require(block.timestamp >= dispute.appealPeriodEnd, "The dispute must be executed after its appeal period has ended.");
 
         dispute.status = DisputeStatus.Solved;
-        msg.sender.send(dispute.fees); // Avoid blocking.
+        msg.sender.transfer(dispute.fees);
         dispute.arbitrated.rule(_disputeID, dispute.ruling);
     }
 

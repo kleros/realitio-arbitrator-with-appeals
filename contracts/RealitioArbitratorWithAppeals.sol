@@ -2,7 +2,7 @@
 
 /**
  *  @authors: [@ferittuncer]
- *  @reviewers: [@]
+ *  @reviewers: [@unknownunknown1*, @hbarcelos*]
  *  @auditors: []
  *  @bounties: []
  *  @deployments: []
@@ -13,7 +13,7 @@ pragma abicoder v2;
 
 import "./IRealitio.sol";
 import "./IRealitioArbitrator.sol";
-import "@kleros/arbitrable-proxy-contracts/contracts/IDisputeResolver.sol";
+import "@kleros/dispute-resolver-interface-contract/contracts/solc-0.7.x/IDisputeResolver.sol";
 import "@kleros/ethereum-libraries/contracts/CappedMath.sol";
 
 /**
