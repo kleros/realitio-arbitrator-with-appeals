@@ -30,7 +30,7 @@ module.exports = {
         }),
       network_id: 3,
       skipDryRun: true,
-      gas: 10000000,
+      gas: 8000000,
     },
   },
   // Set default mocha options here, use special reporters etc.
