@@ -1093,10 +1093,10 @@
   resolved "https://registry.yarnpkg.com/@josephg/resolvable/-/resolvable-1.0.0.tgz#cd75b09cfad18cd945de9221d403203aa07e3d0a"
   integrity sha512-OfTtjoqB2doov5aTJxkyAMK8dXoo7CjCUQSYUEtiY34jbWduOGV7+168tmCT8COMsUEd5DMSFg/0iAOPCBTNAQ==
 
-"@kleros/dispute-resolver-interface-contract@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@kleros/dispute-resolver-interface-contract/-/dispute-resolver-interface-contract-1.0.0.tgz#d8e55968bcf01dc43ef7c25d5f4cbe1dc49d5fc0"
-  integrity sha512-iUfJq6h+0nQZ1R/Fq999v5pGR6EZtYkLY4Fbm7tbKCmjw2fr+y6uzCsJXKM2q6MgHAg1jw+E8l52UtTh9v+lOw==
+"@kleros/dispute-resolver-interface-contract@^1.0.0":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@kleros/dispute-resolver-interface-contract/-/dispute-resolver-interface-contract-1.0.2.tgz#c4c2e68304136875c8dcb67cada23a757e481957"
+  integrity sha512-AXT8IJTXLcDrr/VztvKNk9L5PGDUg3Nbm3jGG5IshQ4PnUqLqXasXzZi2gQnbONR3VQCEiQlKgLvgyE71h7k9w==
   dependencies:
     "@kleros/erc-792" "7.0.0"
 
