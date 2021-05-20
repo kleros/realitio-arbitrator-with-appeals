@@ -51,7 +51,7 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
         Status status; // The current status of the question.
         address disputer; // The address that requested the arbitration.
         uint256 disputeID; // The ID of the dispute raised in the arbitrator contract.
-        uint256 answer; // The answer given by the arbitrator shifted by -1 to match Realitio format.
+        uint256 answer; // The ruling given by the arbitrator.
         Round[] rounds; // Tracks each appeal round of a dispute.
     }
 
@@ -64,7 +64,7 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
         uint256[] fundedRulings; // Stores the answer choices that are fully funded.
     }
 
-    mapping(uint256 => ArbitrationRequest) public ArbitrationRequests; // Maps a question identifier in uint to its arbitration details.
+    mapping(uint256 => ArbitrationRequest) public arbitrationRequests; // Maps a question identifier in uint to its arbitration details.
     mapping(uint256 => uint256) public override externalIDtoLocalID; // Map arbitrator dispute identifiers to local identifiers. We use questions id casted to uint as local identifier.
 
     /** @dev Emitted when arbitration is requested, to link dispute identifier to question identifier for dynamic script that is used in metaevidence. See https://github.com/kleros/realitio-script/blob/master/src/index.js
@@ -101,7 +101,7 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
      *  @param  _evidenceURI Link to evidence.
      */
     function submitEvidence(uint256 _questionID, string calldata _evidenceURI) external override {
-        ArbitrationRequest storage arbitrationRequest = ArbitrationRequests[_questionID];
+        ArbitrationRequest storage arbitrationRequest = arbitrationRequests[_questionID];
         require(arbitrationRequest.status < Status.Ruled, "Cannot submit evidence to a resolved dispute.");
         emit Evidence(arbitrator, _questionID, msg.sender, _evidenceURI); // We use _questionID for evidence group identifier.
     }
@@ -122,7 +122,7 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
     function requestArbitration(bytes32 _questionID, uint256 _maxPrevious) external payable returns (uint256 disputeID) {
         require(metaEvidenceUpdates > 0, "There is no metaevidence yet.");
 
-        ArbitrationRequest storage arbitrationRequest = ArbitrationRequests[uint256(_questionID)];
+        ArbitrationRequest storage arbitrationRequest = arbitrationRequests[uint256(_questionID)];
         require(arbitrationRequest.status == Status.None, "Arbitration already requested");
 
         // Notify Kleros
@@ -141,7 +141,33 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
         // Notify Realitio
         realitio.notifyOfArbitrationRequest(_questionID, msg.sender, _maxPrevious);
 
-        msg.sender.transfer(msg.value.subCap(arbitrationCost)); // Return excess msg.value to sender.
+        msg.sender.send(msg.value.subCap(arbitrationCost)); // Return excess msg.value to sender.
+    }
+
+    /** @dev Receives ruling from Kleros and enforces it.
+     *  @param _disputeID ID of Kleros dispute.
+     *  @param _ruling Ruling that is given by Kleros. This needs to be converted to Realitio answer before reporting the answer by shifting by 1.
+     */
+    function rule(uint256 _disputeID, uint256 _ruling) public override {
+        uint256 questionID = externalIDtoLocalID[_disputeID];
+        ArbitrationRequest storage arbitrationRequest = arbitrationRequests[questionID];
+
+        require(IArbitrator(msg.sender) == arbitrator, "Only arbitrator allowed");
+        require(_ruling <= NUMBER_OF_RULING_OPTIONS, "Invalid ruling");
+        require(arbitrationRequest.status == Status.Disputed, "Invalid arbitration status");
+
+        Round storage round = arbitrationRequest.rounds[arbitrationRequest.rounds.length - 1];
+
+        // If there is only one ruling option in last round that is fully funded, no matter what Kleros ruling was this ruling option is the winner by default.
+        uint256 finalRuling = (round.fundedRulings.length == 1) ? round.fundedRulings[0] : _ruling;
+
+        arbitrationRequest.answer = finalRuling;
+        arbitrationRequest.status = Status.Ruled;
+
+        // Notify Kleros
+        emit Ruling(IArbitrator(msg.sender), _disputeID, finalRuling);
+
+        // Ready to call `reportAnswer` now.
     }
 
     /** @dev Reports the answer to a specified question from the Kleros arbitrator to the Realitio v2.1 contract.
@@ -158,7 +184,7 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
         bytes32 _lastAnswerOrCommitmentID,
         address _lastAnswerer
     ) external {
-        ArbitrationRequest storage arbitrationRequest = ArbitrationRequests[uint256(_questionID)];
+        ArbitrationRequest storage arbitrationRequest = arbitrationRequests[uint256(_questionID)];
         require(arbitrationRequest.status == Status.Ruled, "The status should be Ruled.");
 
         arbitrationRequest.status = Status.Reported;
@@ -183,37 +209,11 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
         address _lastAnswerer,
         bool _isCommitment
     ) external {
-        ArbitrationRequest storage arbitrationRequest = ArbitrationRequests[uint256(_questionID)];
+        ArbitrationRequest storage arbitrationRequest = arbitrationRequests[uint256(_questionID)];
         require(arbitrationRequest.status == Status.Ruled, "The status should be Ruled.");
         require(realitio.getHistoryHash(_questionID) == keccak256(abi.encodePacked(_lastHistoryHash, _lastAnswerOrCommitmentID, _lastBond, _lastAnswerer, _isCommitment)), "The hash of the history parameters supplied does not match the one stored in the Realitio contract."); // This is normally Realitio's responsibility to check but it does not, so we do instead. This is fixed in v2.1.
 
         realitio.submitAnswerByArbitrator(_questionID, bytes32(arbitrationRequest.answer - 1), computeWinner(_questionID, _lastAnswerOrCommitmentID, _lastBond, _lastAnswerer, _isCommitment, arbitrationRequest));
-    }
-
-    /** @dev Receives ruling from Kleros and enforces it.
-     *  @param _disputeID ID of Kleros dispute.
-     *  @param _ruling Ruling that is given by Kleros. This needs to be converted to Realitio answer by shifting by 1.
-     */
-    function rule(uint256 _disputeID, uint256 _ruling) public override {
-        uint256 questionID = externalIDtoLocalID[_disputeID];
-        ArbitrationRequest storage arbitrationRequest = ArbitrationRequests[questionID];
-
-        require(IArbitrator(msg.sender) == arbitrator, "Only arbitrator allowed");
-        require(_ruling <= NUMBER_OF_RULING_OPTIONS, "Invalid ruling");
-        require(arbitrationRequest.status == Status.Disputed, "Invalid arbitration status");
-
-        Round storage round = arbitrationRequest.rounds[arbitrationRequest.rounds.length - 1];
-
-        // If there is only one ruling option in last round that is fully funded, no matter what Kleros ruling was this ruling option is the winner by default.
-        uint256 finalRuling = (round.fundedRulings.length == 1) ? round.fundedRulings[0] : _ruling;
-
-        arbitrationRequest.answer = finalRuling;
-        arbitrationRequest.status = Status.Ruled;
-
-        // Notify Kleros
-        emit Ruling(IArbitrator(msg.sender), _disputeID, finalRuling);
-
-        // Ready to call `reportAnswer` now.
     }
 
     /** @dev TRUSTED. Manages crowdfunded appeals contributions and calls appeal function of the Kleros arbitrator to appeal a dispute.
@@ -224,7 +224,7 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
      */
     function fundAppeal(uint256 _questionID, uint256 _ruling) external payable override returns (bool fullyFunded) {
         require(_ruling <= NUMBER_OF_RULING_OPTIONS, "Answer is out of bounds");
-        ArbitrationRequest storage arbitrationRequest = ArbitrationRequests[_questionID];
+        ArbitrationRequest storage arbitrationRequest = arbitrationRequests[_questionID];
         uint256 disputeID = arbitrationRequest.disputeID;
         require(arbitrationRequest.status == Status.Disputed, "No dispute to appeal.");
 
@@ -258,7 +258,7 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
             arbitrator.appeal{value: originalCost}(disputeID, arbitratorExtraData);
         }
 
-        msg.sender.transfer(msg.value.subCap(contribution)); // Sending extra value back to contributor.
+        msg.sender.send(msg.value.subCap(contribution)); // Sending extra value back to contributor.
 
         return lastRound.hasPaid[_ruling];
     }
@@ -323,6 +323,8 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
     }
 
     /** @dev Allows to withdraw any rewards or reimbursable fees after the dispute gets resolved. For multiple rulings options and for all rounds at once.
+     *  This function has O(m*n) time complexity where m is number of rounds and n is the number of ruling options contributed by given user.
+     *  It is safe to assume m is always less than 10 as appeal cost growth order is O(m^2).
      *  @param _questionID Identifier of the Realitio question, casted to uint. This also serves as the local identifier in this contract.
      *  @param _contributor The address whose rewards to withdraw.
      *  @param _contributedTo Rulings that received contributions from contributor.
@@ -332,7 +334,7 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
         address payable _contributor,
         uint256[] memory _contributedTo
     ) external override {
-        ArbitrationRequest storage arbitrationRequest = ArbitrationRequests[_questionID];
+        ArbitrationRequest storage arbitrationRequest = arbitrationRequests[_questionID];
         uint256 noOfRounds = arbitrationRequest.rounds.length;
 
         for (uint256 roundNumber = 0; roundNumber < noOfRounds; roundNumber++) {
@@ -341,6 +343,8 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
     }
 
     /** @dev Allows to withdraw any reimbursable fees or rewards after the dispute gets solved. For multiple ruling options at once.
+     *  This function has O(n) time complexity where n is number of ruling options contributed by given user.
+     *  It is safe to assume n is always less than 3 as it does not make sense to contribute to different ruling options in the same round, so it will rarely be greater than 1.
      *  @param _questionID Identifier of the Realitio question, casted to uint. This also serves as the local identifier in this contract.
      *  @param _contributor The address whose rewards to withdraw.
      *  @param _roundNumber The number of the round caller wants to withdraw from.
@@ -371,16 +375,17 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
         uint256 _roundNumber,
         uint256 _ruling
     ) public override returns (uint256 amount) {
-        ArbitrationRequest storage arbitrationRequest = ArbitrationRequests[_questionID];
+        ArbitrationRequest storage arbitrationRequest = arbitrationRequests[_questionID];
 
         Round storage round = arbitrationRequest.rounds[_roundNumber];
 
         require(arbitrationRequest.status > Status.Disputed, "There is no ruling yet.");
 
-        amount = getWithdrawableAmount(round, _contributor, _ruling, arbitrationRequest.answer + 1);
+        amount = getWithdrawableAmount(round, _contributor, _ruling, arbitrationRequest.answer);
 
-        if (amount != 0 && _contributor.send(amount)) {
+        if (amount != 0) {
             round.contributions[_contributor][_ruling] = 0;
+            _contributor.send(amount); // Ignoring failure condition deliberately.
             emit Withdrawal(_questionID, _roundNumber, _ruling, _contributor, amount);
         }
     }
@@ -434,10 +439,10 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
         address payable _contributor,
         uint256[] memory _contributedTo
     ) external view override returns (uint256 sum) {
-        ArbitrationRequest storage arbitrationRequest = ArbitrationRequests[_questionID];
+        ArbitrationRequest storage arbitrationRequest = arbitrationRequests[_questionID];
         if (arbitrationRequest.status < Status.Ruled) return 0;
         uint256 noOfRounds = arbitrationRequest.rounds.length;
-        uint256 finalRuling = uint256(arbitrationRequest.answer) + 1;
+        uint256 finalRuling = arbitrationRequest.answer;
 
         for (uint256 roundNumber = 0; roundNumber < noOfRounds; roundNumber++) {
             Round storage round = arbitrationRequest.rounds[roundNumber];
