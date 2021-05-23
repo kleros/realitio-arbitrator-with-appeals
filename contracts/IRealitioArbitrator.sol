@@ -9,7 +9,7 @@
  */
 
 pragma solidity ^0.7.6;
-import "./IRealitio.sol";
+import "./IRealitioBase.sol";
 
 /**
  *  @title IRealitioArbitrator
@@ -18,7 +18,7 @@ import "./IRealitio.sol";
 interface IRealitioArbitrator {
     /** @dev Returns Realitio implementation instance.
      */
-    function realitio() external view returns (IRealitio);
+    function realitio() external view returns (address);
 
     /** @dev Provides a string of json-encoded metadata. The following properties are scheduled for implementation in the Reality.eth dapp:
         tos: A URI representing the location of a terms-of-service document for the arbitrator.

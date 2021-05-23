@@ -11,21 +11,21 @@
 pragma solidity ^0.7.0;
 pragma abicoder v2;
 
-import "./IRealitio.sol";
+import "./IRealitio_v2_1.sol";
 import "./IRealitioArbitrator.sol";
 import "@kleros/dispute-resolver-interface-contract/contracts/solc-0.7.x/IDisputeResolver.sol";
 import "@kleros/ethereum-libraries/contracts/CappedMath.sol";
 
 /**
- *  @title RealitioArbitratorWithAppeals
- *  @dev A Realitio arbitrator implementation that uses Realitio v2 and Kleros. It notifies Realitio contract for arbitration requests and creates corresponding dispute on Kleros. Transmits Kleros ruling to Realitio contract. Maintains crowdfunded appeals and notifies Kleros contract. Provides a function to submit evidence for Kleros dispute.
+ *  @title Realitio_v2_1_ArbitratorWithAppeals
+ *  @dev A Realitio arbitrator implementation that uses Realitio v2.1 and Kleros. It notifies Realitio contract for arbitration requests and creates corresponding dispute on Kleros. Transmits Kleros ruling to Realitio contract. Maintains crowdfunded appeals and notifies Kleros contract. Provides a function to submit evidence for Kleros dispute.
  *  There is a conversion between Kleros ruling and Realitio answer and there is a need for shifting by 1. This is because ruling 0 in Kleros signals tie or no-ruling but in Realitio 0 is a valid answer. For reviewers this should be a focus as it's quite easy to get confused. Any mistakes on this conversion will render this contract useless.
  *  NOTE: This contract trusts the Kleros arbitrator and Realitio.
  */
-contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator {
+contract Realitio_v2_1_ArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator {
     using CappedMath for uint256; // Overflows and underflows are prevented by returning uint256 max and min values in case of overflows and underflows, respectively.
 
-    IRealitio public immutable override realitio; // Actual implementation of Realitio.
+    address public immutable override realitio; // Actual implementation of Realitio.
     IArbitrator public immutable arbitrator; // The Kleros arbitrator.
     bytes public arbitratorExtraData; // Required for Kleros arbitrator. First 64 characters contain subcourtID and the second 64 characters contain number of votes in the jury.
     address public governor = msg.sender; // The address that can make governance changes.
@@ -85,7 +85,7 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
      *  @param _arbitratorExtraData The extra data used to raise a dispute in the ERC792 arbitrator.
      */
     constructor(
-        IRealitio _realitio,
+        address _realitio,
         string memory _metadata,
         IArbitrator _arbitrator,
         bytes memory _arbitratorExtraData
@@ -139,7 +139,7 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
         arbitrationRequest.rounds.push();
 
         // Notify Realitio
-        realitio.notifyOfArbitrationRequest(_questionID, msg.sender, _maxPrevious);
+        IRealitio_v2_1(realitio).notifyOfArbitrationRequest(_questionID, msg.sender, _maxPrevious);
 
         msg.sender.send(msg.value.subCap(arbitrationCost)); // Return excess msg.value to sender.
     }
@@ -190,30 +190,7 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
         arbitrationRequest.status = Status.Reported;
 
         // Note that answer(ruling) is shift by -1 before calling Realitio.
-        realitio.assignWinnerAndSubmitAnswerByArbitrator(_questionID, bytes32(arbitrationRequest.answer - 1), arbitrationRequest.disputer, _lastHistoryHash, _lastAnswerOrCommitmentID, _lastAnswerer);
-    }
-
-    /** @dev Compute winner and report the answer to a specified question from the ERC792 arbitrator to the Realitio v2.0 contract. TRUSTED.
-     *  @param _questionID The ID of the question.
-     *  @param _lastHistoryHash The history hash given with the last answer to the question in the Realitio contract.
-     *  @param _lastAnswerOrCommitmentID The last answer given, or its commitment ID if it was a commitment, to the question in the Realitio contract.
-     *  @param _lastBond The bond paid for the last answer to the question in the Realitio contract.
-     *  @param _lastAnswerer The last answerer to the question in the Realitio contract.
-     *  @param _isCommitment Whether the last answer to the question in the Realitio contract used commit or reveal or not. True if it did, false otherwise.
-     */
-    function computeWinnerAndReportAnswer(
-        bytes32 _questionID,
-        bytes32 _lastHistoryHash,
-        bytes32 _lastAnswerOrCommitmentID,
-        uint256 _lastBond,
-        address _lastAnswerer,
-        bool _isCommitment
-    ) external {
-        ArbitrationRequest storage arbitrationRequest = arbitrationRequests[uint256(_questionID)];
-        require(arbitrationRequest.status == Status.Ruled, "The status should be Ruled.");
-        require(realitio.getHistoryHash(_questionID) == keccak256(abi.encodePacked(_lastHistoryHash, _lastAnswerOrCommitmentID, _lastBond, _lastAnswerer, _isCommitment)), "The hash of the history parameters supplied does not match the one stored in the Realitio contract."); // This is normally Realitio's responsibility to check but it does not, so we do instead. This is fixed in v2.1.
-
-        realitio.submitAnswerByArbitrator(_questionID, bytes32(arbitrationRequest.answer - 1), computeWinner(_questionID, _lastAnswerOrCommitmentID, _lastBond, _lastAnswerer, _isCommitment, arbitrationRequest));
+        IRealitio_v2_1(realitio).assignWinnerAndSubmitAnswerByArbitrator(_questionID, bytes32(arbitrationRequest.answer - 1), arbitrationRequest.disputer, _lastHistoryHash, _lastAnswerOrCommitmentID, _lastAnswerer);
     }
 
     /** @dev TRUSTED. Manages crowdfunded appeals contributions and calls appeal function of the Kleros arbitrator to appeal a dispute.
@@ -388,44 +365,6 @@ contract RealitioArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator 
             _contributor.send(amount); // Ignoring failure condition deliberately.
             emit Withdrawal(_questionID, _roundNumber, _ruling, _contributor, amount);
         }
-    }
-
-    /** @dev Computes the Realitio answerer, of a specified question, that should win. This function is needed to avoid the "stack too deep error". TRUSTED.
-     *  @param _questionID The ID of the question.
-     *  @param _lastAnswerOrCommitmentID The last answer given, or its commitment ID if it was a commitment, to the question in the Realitio contract.
-     *  @param _lastBond The bond paid for the last answer to the question in the Realitio contract.
-     *  @param _lastAnswerer The last answerer to the question in the Realitio contract.
-     *  @param _isCommitment Whether the last answer to the question in the Realitio contract used commit or reveal or not. True if it did, false otherwise.
-     *  @return winner The computed winner.
-     */
-    function computeWinner(
-        bytes32 _questionID,
-        bytes32 _lastAnswerOrCommitmentID,
-        uint256 _lastBond,
-        address _lastAnswerer,
-        bool _isCommitment,
-        ArbitrationRequest storage _arbitrationRequest
-    ) internal view returns (address winner) {
-        bytes32 lastAnswer;
-        bool isAnswered;
-        if (_lastBond == 0) {
-            // If the question hasn't been answered, nobody is ever right.
-            isAnswered = false;
-        } else if (_isCommitment) {
-            (uint32 revealTS, bool isRevealed, bytes32 revealedAnswer) = realitio.commitments(_lastAnswerOrCommitmentID);
-            if (isRevealed) {
-                lastAnswer = revealedAnswer;
-                isAnswered = true;
-            } else {
-                require(revealTS <= uint32(block.timestamp), "Arbitration cannot be done until the last answerer has had time to reveal its commitment.");
-                isAnswered = false;
-            }
-        } else {
-            lastAnswer = _lastAnswerOrCommitmentID;
-            isAnswered = true;
-        }
-
-        return isAnswered && lastAnswer == bytes32(_arbitrationRequest.answer - 1) ? _lastAnswerer : _arbitrationRequest.disputer;
     }
 
     /** @dev Returns the sum of withdrawable amount.
