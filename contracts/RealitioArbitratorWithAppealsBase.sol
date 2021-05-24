@@ -11,18 +11,18 @@
 pragma solidity ^0.7.0;
 pragma abicoder v2;
 
-import "./IRealitio_v2_1.sol";
+import "./IRealitioBase.sol";
 import "./IRealitioArbitrator.sol";
 import "@kleros/dispute-resolver-interface-contract/contracts/solc-0.7.x/IDisputeResolver.sol";
 import "@kleros/ethereum-libraries/contracts/CappedMath.sol";
 
 /**
- *  @title Realitio_v2_1_ArbitratorWithAppeals
- *  @dev A Realitio arbitrator implementation that uses Realitio v2.1 and Kleros. It notifies Realitio contract for arbitration requests and creates corresponding dispute on Kleros. Transmits Kleros ruling to Realitio contract. Maintains crowdfunded appeals and notifies Kleros contract. Provides a function to submit evidence for Kleros dispute.
+ *  @title Realitio_v2_0_ArbitratorWithAppeals
+ *  @dev A Realitio arbitrator implementation that uses Realitio v2.0 and Kleros. It notifies Realitio contract for arbitration requests and creates corresponding dispute on Kleros. Transmits Kleros ruling to Realitio contract. Maintains crowdfunded appeals and notifies Kleros contract. Provides a function to submit evidence for Kleros dispute.
  *  There is a conversion between Kleros ruling and Realitio answer and there is a need for shifting by 1. This is because ruling 0 in Kleros signals tie or no-ruling but in Realitio 0 is a valid answer. For reviewers this should be a focus as it's quite easy to get confused. Any mistakes on this conversion will render this contract useless.
  *  NOTE: This contract trusts the Kleros arbitrator and Realitio.
  */
-contract Realitio_v2_1_ArbitratorWithAppeals is IDisputeResolver, IRealitioArbitrator {
+abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealitioArbitrator {
     using CappedMath for uint256; // Overflows and underflows are prevented by returning uint256 max and min values in case of overflows and underflows, respectively.
 
     address public immutable override realitio; // Actual implementation of Realitio.
@@ -127,7 +127,7 @@ contract Realitio_v2_1_ArbitratorWithAppeals is IDisputeResolver, IRealitioArbit
 
         // Notify Kleros
         uint256 arbitrationCost = arbitrator.arbitrationCost(arbitratorExtraData);
-        disputeID = arbitrator.createDispute{value: msg.value}(NUMBER_OF_RULING_OPTIONS, arbitratorExtraData);
+        disputeID = arbitrator.createDispute{value: arbitrationCost}(NUMBER_OF_RULING_OPTIONS, arbitratorExtraData);
         emit Dispute(arbitrator, disputeID, metaEvidenceUpdates - 1, uint256(_questionID)); // We use _questionID in uint as evidence group identifier.
         emit DisputeIDToQuestionID(disputeID, _questionID); // For the dynamic script https://github.com/kleros/realitio-script/blob/master/src/index.js
         externalIDtoLocalID[disputeID] = uint256(_questionID);
@@ -139,7 +139,7 @@ contract Realitio_v2_1_ArbitratorWithAppeals is IDisputeResolver, IRealitioArbit
         arbitrationRequest.rounds.push();
 
         // Notify Realitio
-        IRealitio_v2_1(realitio).notifyOfArbitrationRequest(_questionID, msg.sender, _maxPrevious);
+        IRealitioBase(realitio).notifyOfArbitrationRequest(_questionID, msg.sender, _maxPrevious);
 
         msg.sender.send(msg.value.subCap(arbitrationCost)); // Return excess msg.value to sender.
     }
@@ -168,29 +168,6 @@ contract Realitio_v2_1_ArbitratorWithAppeals is IDisputeResolver, IRealitioArbit
         emit Ruling(IArbitrator(msg.sender), _disputeID, finalRuling);
 
         // Ready to call `reportAnswer` now.
-    }
-
-    /** @dev Reports the answer to a specified question from the Kleros arbitrator to the Realitio v2.1 contract.
-     *  This can be called by anyone, after the dispute gets a ruling from Kleros.
-        We can't directly call `assignWinnerAndSubmitAnswerByArbitrator` inside `rule` because of extra parameters (e.g. _lastHistoryHash).
-     *  @param _questionID The ID of Realitio question.
-     *  @param _lastHistoryHash The history hash given with the last answer to the question in the Realitio contract.
-     *  @param _lastAnswerOrCommitmentID The last answer given, or its commitment ID if it was a commitment, to the question in the Realitio contract, in bytes32.
-     *  @param _lastAnswerer The last answerer to the question in the Realitio contract.
-     */
-    function reportAnswer(
-        bytes32 _questionID,
-        bytes32 _lastHistoryHash,
-        bytes32 _lastAnswerOrCommitmentID,
-        address _lastAnswerer
-    ) external {
-        ArbitrationRequest storage arbitrationRequest = arbitrationRequests[uint256(_questionID)];
-        require(arbitrationRequest.status == Status.Ruled, "The status should be Ruled.");
-
-        arbitrationRequest.status = Status.Reported;
-
-        // Note that answer(ruling) is shift by -1 before calling Realitio.
-        IRealitio_v2_1(realitio).assignWinnerAndSubmitAnswerByArbitrator(_questionID, bytes32(arbitrationRequest.answer - 1), arbitrationRequest.disputer, _lastHistoryHash, _lastAnswerOrCommitmentID, _lastAnswerer);
     }
 
     /** @dev TRUSTED. Manages crowdfunded appeals contributions and calls appeal function of the Kleros arbitrator to appeal a dispute.

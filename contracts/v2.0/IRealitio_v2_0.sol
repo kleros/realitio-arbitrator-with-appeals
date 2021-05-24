@@ -8,7 +8,7 @@
  *  @deployments: []
  */
 
-import "./IRealitioBase.sol";
+import "../IRealitioBase.sol";
 
 pragma solidity ^0.7.6;
 
