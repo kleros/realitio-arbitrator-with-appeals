@@ -11,13 +11,15 @@
 pragma solidity ^0.7.0;
 pragma abicoder v2;
 
-import "./IRealitio_v2_1.sol";
-import "../RealitioArbitratorWithAppealsBase.sol";
+import "./IRealitio.sol";
+import "./RealitioArbitratorWithAppealsBase.sol";
 
 /**
  *  @title Realitio_v2_1_ArbitratorWithAppeals
- *  @dev A Realitio arbitrator implementation that uses Realitio v2.1 and Kleros. It notifies Realitio contract for arbitration requests and creates corresponding dispute on Kleros. Transmits Kleros ruling to Realitio contract. Maintains crowdfunded appeals and notifies Kleros contract. Provides a function to submit evidence for Kleros dispute.
- *  There is a conversion between Kleros ruling and Realitio answer and there is a need for shifting by 1. This is because ruling 0 in Kleros signals tie or no-ruling but in Realitio 0 is a valid answer. For reviewers this should be a focus as it's quite easy to get confused. Any mistakes on this conversion will render this contract useless.
+ *  @dev A Realitio arbitrator implementation that uses Realitio v2.1 and Kleros. It notifies Realitio contract for arbitration requests and creates corresponding dispute on Kleros.
+ *  Transmits Kleros ruling to Realitio contract. Maintains crowdfunded appeals and notifies Kleros contract. Provides a function to submit evidence for Kleros dispute.
+ *  There is a conversion between Kleros ruling and Realitio answer and there is a need for shifting by 1. This is because ruling 0 in Kleros signals tie or no-ruling but in Realitio 0 is a valid answer.
+ *  For reviewers this should be a focus as it's quite easy to get confused. Any mistakes on this conversion will render this contract useless.
  *  NOTE: This contract trusts the Kleros arbitrator and Realitio.
  */
 contract Realitio_v2_1_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBase {
@@ -28,7 +30,7 @@ contract Realitio_v2_1_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
      *  @param _arbitratorExtraData The extra data used to raise a dispute in the ERC792 arbitrator.
      */
     constructor(
-        address _realitio,
+        IRealitio _realitio,
         string memory _metadata,
         IArbitrator _arbitrator,
         bytes memory _arbitratorExtraData
@@ -54,7 +56,14 @@ contract Realitio_v2_1_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
         arbitrationRequest.status = Status.Reported;
 
         // Note that answer(ruling) is shift by -1 before calling Realitio.
-        IRealitio_v2_1(realitio).assignWinnerAndSubmitAnswerByArbitrator(_questionID, bytes32(arbitrationRequest.answer - 1), arbitrationRequest.disputer, _lastHistoryHash, _lastAnswerOrCommitmentID, _lastAnswerer);
+        realitio.assignWinnerAndSubmitAnswerByArbitrator(
+            _questionID,
+            bytes32(arbitrationRequest.answer - 1),
+            arbitrationRequest.requester,
+            _lastHistoryHash,
+            _lastAnswerOrCommitmentID,
+            _lastAnswerer
+        );
     }
 
     /* Private Views */

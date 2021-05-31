@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 
+// Truffle migration contract, do not review.
+
 pragma solidity >=0.7.0 <0.8.0;
 
 contract Migrations {

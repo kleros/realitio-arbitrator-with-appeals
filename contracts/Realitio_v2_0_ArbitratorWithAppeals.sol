@@ -11,13 +11,16 @@
 pragma solidity ^0.7.0;
 pragma abicoder v2;
 
-import "./IRealitio_v2_0.sol";
-import "../RealitioArbitratorWithAppealsBase.sol";
+import "./IRealitio.sol";
+import "./RealitioArbitratorWithAppealsBase.sol";
 
 /**
  *  @title Realitio_v2_0_ArbitratorWithAppeals
- *  @dev A Realitio arbitrator implementation that uses Realitio v2.0 and Kleros. It notifies Realitio contract for arbitration requests and creates corresponding dispute on Kleros. Transmits Kleros ruling to Realitio contract. Maintains crowdfunded appeals and notifies Kleros contract. Provides a function to submit evidence for Kleros dispute.
- *  There is a conversion between Kleros ruling and Realitio answer and there is a need for shifting by 1. This is because ruling 0 in Kleros signals tie or no-ruling but in Realitio 0 is a valid answer. For reviewers this should be a focus as it's quite easy to get confused. Any mistakes on this conversion will render this contract useless.
+ *  @dev A Realitio arbitrator implementation that uses Realitio v2.0 and Kleros.
+ *  It notifies Realitio contract for arbitration requests and creates corresponding dispute on Kleros. Transmits Kleros ruling to Realitio contract.
+ *  Maintains crowdfunded appeals and notifies Kleros contract. Provides a function to submit evidence for Kleros dispute.
+ *  There is a conversion between Kleros ruling and Realitio answer and there is a need for shifting by 1. This is because ruling 0 in Kleros signals tie or no-ruling but in Realitio 0 is a valid answer.
+ *  For reviewers this should be a focus as it's quite easy to get confused. Any mistakes on this conversion will render this contract useless.
  *  NOTE: This contract trusts the Kleros arbitrator and Realitio.
  */
 contract Realitio_v2_0_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBase {
@@ -28,7 +31,7 @@ contract Realitio_v2_0_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
      *  @param _arbitratorExtraData The extra data used to raise a dispute in the ERC792 arbitrator.
      */
     constructor(
-        address _realitio,
+        IRealitio _realitio,
         string memory _metadata,
         IArbitrator _arbitrator,
         bytes memory _arbitratorExtraData
@@ -52,9 +55,33 @@ contract Realitio_v2_0_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
     ) external {
         ArbitrationRequest storage arbitrationRequest = arbitrationRequests[uint256(_questionID)];
         require(arbitrationRequest.status == Status.Ruled, "The status should be Ruled.");
-        require(IRealitio_v2_0(realitio).getHistoryHash(_questionID) == keccak256(abi.encodePacked(_lastHistoryHash, _lastAnswerOrCommitmentID, _lastBond, _lastAnswerer, _isCommitment)), "The hash of the history parameters supplied does not match the one stored in the Realitio contract."); // This is normally Realitio's responsibility to check but it does not, so we do instead. This is fixed in v2.1.
+        require(
+            realitio.getHistoryHash(_questionID) ==
+                keccak256(
+                    abi.encodePacked(
+                        _lastHistoryHash,
+                        _lastAnswerOrCommitmentID,
+                        _lastBond,
+                        _lastAnswerer,
+                        _isCommitment
+                    )
+                ),
+            "The hash of the history parameters supplied does not match the one stored in the Realitio contract."
+        ); // This is normally Realitio's responsibility to check but it does not, so we do instead. This is fixed in v2.1.
 
-        IRealitio_v2_0(realitio).submitAnswerByArbitrator(_questionID, bytes32(arbitrationRequest.answer - 1), computeWinner(arbitrationRequest, _lastAnswerOrCommitmentID, _lastBond, _lastAnswerer, _isCommitment));
+        realitio.submitAnswerByArbitrator(
+            _questionID,
+            bytes32(arbitrationRequest.answer - 1),
+            computeWinner(
+                arbitrationRequest,
+                _lastAnswerOrCommitmentID,
+                _lastBond,
+                _lastAnswerer,
+                _isCommitment
+            )
+        );
+
+        arbitrationRequest.status = Status.Reported;
     }
 
     /** @dev Computes the Realitio answerer, of a specified question, that should win. This function is needed to avoid the "stack too deep error". TRUSTED.
@@ -78,12 +105,16 @@ contract Realitio_v2_0_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
             // If the question hasn't been answered, nobody is ever right.
             isAnswered = false;
         } else if (_isCommitment) {
-            (uint32 revealTS, bool isRevealed, bytes32 revealedAnswer) = IRealitio_v2_0(realitio).commitments(_lastAnswerOrCommitmentID);
+            (uint32 revealTS, bool isRevealed, bytes32 revealedAnswer) =
+                realitio.commitments(_lastAnswerOrCommitmentID);
             if (isRevealed) {
                 lastAnswer = revealedAnswer;
                 isAnswered = true;
             } else {
-                require(revealTS <= uint32(block.timestamp), "Arbitration cannot be done until the last answerer has had time to reveal its commitment.");
+                require(
+                    revealTS <= uint32(block.timestamp),
+                    "Arbitration cannot be done until the last answerer has had time to reveal its commitment."
+                );
                 isAnswered = false;
             }
         } else {
@@ -91,6 +122,9 @@ contract Realitio_v2_0_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
             isAnswered = true;
         }
 
-        return isAnswered && lastAnswer == bytes32(_arbitrationRequest.answer - 1) ? _lastAnswerer : _arbitrationRequest.disputer;
+        return
+            isAnswered && lastAnswer == bytes32(_arbitrationRequest.answer - 1)
+                ? _lastAnswerer
+                : _arbitrationRequest.requester;
     }
 }
