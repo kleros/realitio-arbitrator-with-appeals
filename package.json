@@ -1,6 +1,6 @@
 {
   "name": "@kleros/realitio-arbitrator-with-appeals",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "index.js",
   "repository": "https://github.com/kleros/realitio-arbitrator-with-appeals",
   "author": "Kleros",
