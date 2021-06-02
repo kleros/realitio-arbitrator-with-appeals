@@ -29,7 +29,7 @@
     "ganache": "ganache-cli -g 1 -l 1000000000",
     "test": "truffle test",
     "prepack": "prettier --write 'contracts/**/*.sol' && NETWORK=kovan npm run deploy",
-    "deploy": "truffle migrate --reset --network $NETWORK && sleep 3 && truffle run verify RealitioArbitratorWithAppeals --network $NETWORK"
+    "deploy": "truffle migrate --reset --network $NETWORK && sleep 3 && truffle run verify Realitio_v2_0_ArbitratorWithAppeals --network $NETWORK"
   },
   "files": [
     "build",
