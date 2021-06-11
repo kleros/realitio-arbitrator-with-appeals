@@ -271,8 +271,6 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         return arbitrator.arbitrationCost(arbitratorExtraData);
     }
 
-    /** @dev Calculate history has for given
-
     /** @dev Returns multipliers for appeals.
      *  @return _winnerStakeMultiplier Winners stake multiplier.
      *  @return _loserStakeMultiplier Losers stake multiplier.
