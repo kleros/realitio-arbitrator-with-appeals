@@ -2,7 +2,7 @@
 
 /**
  *  @authors: [@ferittuncer]
- *  @reviewers: [@unknownunknown1*, @hbarcelos, @MerlinEgalite, @shalzz]
+ *  @reviewers: [@unknownunknown1*, @hbarcelos*, @MerlinEgalite*, @shalzz*]
  *  @auditors: []
  *  @bounties: []
  *  @deployments: []
@@ -102,10 +102,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
      */
     function submitEvidence(uint256 _questionID, string calldata _evidenceURI) external override {
         ArbitrationRequest storage arbitrationRequest = arbitrationRequests[_questionID];
-        require(
-            arbitrationRequest.status < Status.Ruled,
-            "Cannot submit evidence to a resolved dispute."
-        );
+        require(arbitrationRequest.status < Status.Ruled, "Cannot submit evidence to a resolved dispute.");
         emit Evidence(arbitrator, _questionID, msg.sender, _evidenceURI); // We use _questionID for evidence group identifier.
     }
 
@@ -122,22 +119,18 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
      *  @param _maxPrevious If specified, reverts if a bond higher than this was submitted after you sent your transaction.
      *  @return disputeID ID of the resulting dispute on arbitrator.
      */
-    function requestArbitration(bytes32 _questionID, uint256 _maxPrevious)
-        external
-        payable
-        returns (uint256 disputeID)
-    {
+    function requestArbitration(bytes32 _questionID, uint256 _maxPrevious) external payable returns (uint256 disputeID) {
         require(metaEvidenceUpdates > 0, "There is no metaevidence yet.");
+
+        uint256 arbitrationCost = arbitrator.arbitrationCost(arbitratorExtraData);
+        require(msg.value >= arbitrationCost, "Not enough value to cover arbitration fees.");
 
         ArbitrationRequest storage arbitrationRequest = arbitrationRequests[uint256(_questionID)];
         require(arbitrationRequest.status == Status.None, "Arbitration already requested");
 
         // Notify Kleros
-        uint256 arbitrationCost = arbitrator.arbitrationCost(arbitratorExtraData);
-        disputeID = arbitrator.createDispute{value: arbitrationCost}(
-            NUMBER_OF_RULING_OPTIONS,
-            arbitratorExtraData
-        );
+
+        disputeID = arbitrator.createDispute{value: arbitrationCost}(NUMBER_OF_RULING_OPTIONS, arbitratorExtraData);
         emit Dispute(arbitrator, disputeID, metaEvidenceUpdates - 1, uint256(_questionID)); // We use _questionID in uint as evidence group identifier.
         emit DisputeIDToQuestionID(disputeID, _questionID); // For the dynamic script https://github.com/kleros/realitio-script/blob/master/src/index.js
         externalIDtoLocalID[disputeID] = uint256(_questionID);
@@ -185,12 +178,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
      *  @param _ruling The ruling option to which the caller wants to contribute to.
      *  @return fullyFunded True if the ruling option got fully funded as a result of this contribution.
      */
-    function fundAppeal(uint256 _questionID, uint256 _ruling)
-        external
-        payable
-        override
-        returns (bool fullyFunded)
-    {
+    function fundAppeal(uint256 _questionID, uint256 _ruling) external payable override returns (bool fullyFunded) {
         require(_ruling <= NUMBER_OF_RULING_OPTIONS, "Answer is out of bounds");
         ArbitrationRequest storage arbitrationRequest = arbitrationRequests[_questionID];
         uint256 disputeID = arbitrationRequest.disputeID;
@@ -205,10 +193,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         Round storage lastRound = arbitrationRequest.rounds[lastRoundIndex];
         require(!lastRound.hasPaid[_ruling], "Appeal fee has already been paid.");
 
-        uint256 contribution =
-            totalCost.subCap(lastRound.paidFees[_ruling]) > msg.value
-                ? msg.value
-                : totalCost.subCap(lastRound.paidFees[_ruling]);
+        uint256 contribution = totalCost.subCap(lastRound.paidFees[_ruling]) > msg.value ? msg.value : totalCost.subCap(lastRound.paidFees[_ruling]);
         emit Contribution(_questionID, lastRoundIndex, _ruling, msg.sender, contribution);
 
         lastRound.contributions[msg.sender][_ruling] += contribution;
@@ -288,12 +273,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
             uint256 _denominator
         )
     {
-        return (
-            winnerStakeMultiplier,
-            loserStakeMultiplier,
-            loserAppealPeriodMultiplier,
-            MULTIPLIER_DENOMINATOR
-        );
+        return (winnerStakeMultiplier, loserStakeMultiplier, loserAppealPeriodMultiplier, MULTIPLIER_DENOMINATOR);
     }
 
     /** @dev Allows to withdraw any rewards or reimbursable fees after the dispute gets resolved. For multiple rulings options and for all rounds at once.
@@ -312,12 +292,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         uint256 noOfRounds = arbitrationRequest.rounds.length;
 
         for (uint256 roundNumber = 0; roundNumber < noOfRounds; roundNumber++) {
-            withdrawFeesAndRewardsForMultipleRulings(
-                _questionID,
-                _contributor,
-                roundNumber,
-                _contributedTo
-            );
+            withdrawFeesAndRewardsForMultipleRulings(_questionID, _contributor, roundNumber, _contributedTo);
         }
     }
 
@@ -336,17 +311,8 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         uint256[] memory _contributedTo
     ) public override {
         uint256 contributionArrayLength = _contributedTo.length;
-        for (
-            uint256 contributionNumber = 0;
-            contributionNumber < contributionArrayLength;
-            contributionNumber++
-        ) {
-            withdrawFeesAndRewards(
-                _questionID,
-                _contributor,
-                _roundNumber,
-                _contributedTo[contributionNumber]
-            );
+        for (uint256 contributionNumber = 0; contributionNumber < contributionArrayLength; contributionNumber++) {
+            withdrawFeesAndRewards(_questionID, _contributor, _roundNumber, _contributedTo[contributionNumber]);
         }
     }
 
@@ -398,17 +364,8 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
 
         for (uint256 roundNumber = 0; roundNumber < noOfRounds; roundNumber++) {
             Round storage round = arbitrationRequest.rounds[roundNumber];
-            for (
-                uint256 contributionNumber = 0;
-                contributionNumber < _contributedTo.length;
-                contributionNumber++
-            ) {
-                sum += getWithdrawableAmount(
-                    round,
-                    _contributor,
-                    _contributedTo[contributionNumber],
-                    finalRuling
-                );
+            for (uint256 contributionNumber = 0; contributionNumber < _contributedTo.length; contributionNumber++) {
+                sum += getWithdrawableAmount(round, _contributor, _contributedTo[contributionNumber], finalRuling);
             }
         }
     }
@@ -432,16 +389,10 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
             //Funding was successful for this ruling option.
             if (_contributedTo == _finalRuling) {
                 // This ruling option is the ultimate winner.
-                amount = _round.paidFees[_contributedTo] > 0
-                    ? (_round.contributions[_contributor][_contributedTo] * _round.feeRewards) /
-                        _round.paidFees[_contributedTo]
-                    : 0;
+                amount = _round.paidFees[_contributedTo] > 0 ? (_round.contributions[_contributor][_contributedTo] * _round.feeRewards) / _round.paidFees[_contributedTo] : 0;
             } else if (_round.fundedRulings.length >= 1 && !_round.hasPaid[_finalRuling]) {
                 // The ultimate winner was not funded in this round. In this case funded ruling option(s) wins by default. Prize is distributed among contributors of funded ruling option(s).
-                amount =
-                    (_round.contributions[_contributor][_contributedTo] * _round.feeRewards) /
-                    (_round.paidFees[_round.fundedRulings[0]] +
-                        _round.paidFees[_round.fundedRulings[1]]);
+                amount = (_round.contributions[_contributor][_contributedTo] * _round.feeRewards) / (_round.paidFees[_round.fundedRulings[0]] + _round.paidFees[_round.fundedRulings[1]]);
             }
         }
     }
@@ -480,17 +431,10 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         (uint256 originalStart, uint256 originalEnd) = arbitrator.appealPeriod(_disputeID);
 
         if (_currentRuling == _ruling) {
-            require(
-                block.timestamp >= originalStart && block.timestamp < originalEnd,
-                "Funding must be made within the appeal period."
-            );
+            require(block.timestamp >= originalStart && block.timestamp < originalEnd, "Funding must be made within the appeal period.");
         } else {
             require(
-                block.timestamp >= originalStart &&
-                    block.timestamp <
-                    (originalStart +
-                        ((originalEnd - originalStart) * loserAppealPeriodMultiplier) /
-                        MULTIPLIER_DENOMINATOR),
+                block.timestamp >= originalStart && block.timestamp < (originalStart + ((originalEnd - originalStart) * loserAppealPeriodMultiplier) / MULTIPLIER_DENOMINATOR),
                 "Funding must be made within the appeal period."
             );
         }
