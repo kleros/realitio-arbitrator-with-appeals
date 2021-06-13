@@ -9,7 +9,6 @@
  */
 
 pragma solidity ^0.7.0;
-pragma abicoder v2;
 
 import "./IRealitio.sol";
 import "./RealitioArbitratorWithAppealsBase.sol";
@@ -56,14 +55,7 @@ contract Realitio_v2_1_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
         arbitrationRequest.status = Status.Reported;
 
         // Note that answer(ruling) is shift by -1 before calling Realitio.
-        realitio.assignWinnerAndSubmitAnswerByArbitrator(
-            _questionID,
-            bytes32(arbitrationRequest.answer - 1),
-            arbitrationRequest.requester,
-            _lastHistoryHash,
-            _lastAnswerOrCommitmentID,
-            _lastAnswerer
-        );
+        realitio.assignWinnerAndSubmitAnswerByArbitrator(_questionID, bytes32(arbitrationRequest.answer - 1), arbitrationRequest.requester, _lastHistoryHash, _lastAnswerOrCommitmentID, _lastAnswerer);
     }
 
     /* Private Views */
