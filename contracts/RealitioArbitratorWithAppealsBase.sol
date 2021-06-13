@@ -389,7 +389,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
             if (_contributedTo == _finalRuling) {
                 // This ruling option is the ultimate winner.
                 amount = _round.paidFees[_contributedTo] > 0 ? (_round.contributions[_contributor][_contributedTo] * _round.feeRewards) / _round.paidFees[_contributedTo] : 0;
-            } else if (_round.fundedRulings.length >= 1 && !_round.hasPaid[_finalRuling]) {
+            } else if (!_round.hasPaid[_finalRuling]) {
                 // The ultimate winner was not funded in this round. In this case funded ruling option(s) wins by default. Prize is distributed among contributors of funded ruling option(s).
                 amount = (_round.contributions[_contributor][_contributedTo] * _round.feeRewards) / (_round.paidFees[_round.fundedRulings[0]] + _round.paidFees[_round.fundedRulings[1]]);
             }
