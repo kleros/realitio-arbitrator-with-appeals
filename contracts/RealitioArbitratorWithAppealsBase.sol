@@ -17,7 +17,7 @@ import "@kleros/ethereum-libraries/contracts/CappedMath.sol";
 
 /**
  *  @title Realitio_v2_0_ArbitratorWithAppeals
- *  @dev A Realitio arbitrator base implementation that uses Realitio v2.x and Kleros. It notifies Realitio contract for arbitration requests and creates corresponding dispute on Kleros. Transmits Kleros ruling to Realitio contract. Maintains crowdfunded appeals and notifies Kleros contract. Provides a function to submit evidence for Kleros dispute. This contract is abstract as it does not a function to report answer, see child contracts.
+ *  @dev A Realitio arbitrator base implementation that uses Realitio v2.x and Kleros. It notifies Realitio contract for arbitration requests and creates corresponding dispute on Kleros. Transmits Kleros ruling to Realitio contract. Maintains crowdfunded appeals and notifies Kleros contract. Provides a function to submit evidence for Kleros dispute. This contract is abstract as it does not have a function to report answer, see child contracts.
  *  There is a conversion between Kleros ruling and Realitio answer and there is a need for shifting by 1. This is because ruling 0 in Kleros signals tie or no-ruling but in Realitio 0 is a valid answer. For reviewers this should be a focus as it's quite easy to get confused. Any mistakes on this conversion will render this contract useless.
  *  NOTE: This contract trusts the Kleros arbitrator and Realitio.
  */
@@ -249,7 +249,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
     }
 
     /** @dev Returns arbitration fee by calling arbitrationCost function in the arbitrator contract.
-     *  @return fee Arbitration that needs to be paid.
+     *  @return fee Arbitration fee that needs to be paid.
      */
     function getDisputeFee(bytes32) external view override returns (uint256 fee) {
         return arbitrator.arbitrationCost(arbitratorExtraData);
@@ -370,10 +370,10 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
     }
 
     /** @dev Returns withdrawable amount for given parameters.
-     *  @param _round The round number to calculate amount for.
+     *  @param _round The round to calculate amount for.
      *  @param _contributor The contributor for which to query.
-     *  @param _contributedTo The array which includes ruling options to search for potential withdrawal. Caller can obtain this information using Contribution events.
-     *  @return amount The total amount available to withdraw.
+     *  @param _contributedTo The ruling option to search for potential withdrawal.
+     *  @return amount Amount available to withdraw for given ruling option.
      */
     function getWithdrawableAmount(
         Round storage _round,
@@ -398,11 +398,11 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
 
     /** @dev Retrieves appeal cost for each ruling. It extends the function with the same name on the arbitrator side by adding
      *  _ruling parameter because required amount depends on multipliers.
-     *  @param _disputeID The dispute this function returns its appeal costs.
+     *  @param _disputeID The dispute this function returns the appeal cost for.
      *  @param _ruling The ruling option which the caller wants to return the appeal cost for.
-     *  @param _currentRuling The ruling option which the caller wants to return the appeal cost for.
+     *  @param _currentRuling Latest Kleros decision on this dispute.
      *  @return appealFee_ Arbitration fee to be paid for this appeal round.
-     *  @return totalCost_ Total amount required to this appeal round. This includes arbitration fee plus stake deposits.
+     *  @return totalCost_ Total amount required for this appeal round. This includes arbitration fee plus stake deposits.
      */
     function appealCost(
         uint256 _disputeID,

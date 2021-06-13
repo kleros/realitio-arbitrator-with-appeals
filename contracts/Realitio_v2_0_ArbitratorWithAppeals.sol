@@ -59,9 +59,9 @@ contract Realitio_v2_0_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
             "The hash of the history parameters supplied does not match the one stored in the Realitio contract."
         ); // This is normally Realitio's responsibility to check but it does not, so we do instead. This is fixed in v2.1.
 
-        realitio.submitAnswerByArbitrator(_questionID, bytes32(arbitrationRequest.answer - 1), computeWinner(arbitrationRequest, _lastAnswerOrCommitmentID, _lastBond, _lastAnswerer, _isCommitment));
-
         arbitrationRequest.status = Status.Reported;
+
+        realitio.submitAnswerByArbitrator(_questionID, bytes32(arbitrationRequest.answer - 1), computeWinner(arbitrationRequest, _lastAnswerOrCommitmentID, _lastBond, _lastAnswerer, _isCommitment));
     }
 
     /** @dev Computes the Realitio answerer, of a specified question, that should win. This function is needed to avoid the "stack too deep error". TRUSTED.

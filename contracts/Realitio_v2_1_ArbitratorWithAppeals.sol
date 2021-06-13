@@ -37,7 +37,7 @@ contract Realitio_v2_1_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
 
     /** @dev Reports the answer to a specified question from the Kleros arbitrator to the Realitio v2.1 contract.
      *  This can be called by anyone, after the dispute gets a ruling from Kleros.
-        We can't directly call `assignWinnerAndSubmitAnswerByArbitrator` inside `rule` because of extra parameters (e.g. _lastHistoryHash).
+        We can't directly call `assignWinnerAndSubmitAnswerByArbitrator` inside `rule` because of last answerer is not stored on chain.
      *  @param _questionID The ID of Realitio question.
      *  @param _lastHistoryHash The history hash given with the last answer to the question in the Realitio contract.
      *  @param _lastAnswerOrCommitmentID The last answer given, or its commitment ID if it was a commitment, to the question in the Realitio contract, in bytes32.
@@ -54,9 +54,7 @@ contract Realitio_v2_1_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
 
         arbitrationRequest.status = Status.Reported;
 
-        // Note that answer(ruling) is shift by -1 before calling Realitio.
+        // Note that answer(ruling) is shifted by -1 before calling Realitio.
         realitio.assignWinnerAndSubmitAnswerByArbitrator(_questionID, bytes32(arbitrationRequest.answer - 1), arbitrationRequest.requester, _lastHistoryHash, _lastAnswerOrCommitmentID, _lastAnswerer);
     }
-
-    /* Private Views */
 }
