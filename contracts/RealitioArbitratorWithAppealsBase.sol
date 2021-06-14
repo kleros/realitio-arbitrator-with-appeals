@@ -121,15 +121,12 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
     function requestArbitration(bytes32 _questionID, uint256 _maxPrevious) external payable returns (uint256 disputeID) {
         require(metaEvidenceUpdates > 0, "There is no metaevidence yet.");
 
-        uint256 arbitrationCost = arbitrator.arbitrationCost(arbitratorExtraData);
-        require(msg.value >= arbitrationCost, "Not enough value to cover arbitration fees.");
-
         ArbitrationRequest storage arbitrationRequest = arbitrationRequests[uint256(_questionID)];
         require(arbitrationRequest.status == Status.None, "Arbitration already requested");
 
         // Notify Kleros
-
-        disputeID = arbitrator.createDispute{value: arbitrationCost}(NUMBER_OF_RULING_OPTIONS, arbitratorExtraData);
+        disputeID = arbitrator.createDispute{value: msg.value}(NUMBER_OF_RULING_OPTIONS, arbitratorExtraData); /* If msg.value is greater than intended number of votes (specified in arbitratorExtraData),
+        Kleros will automatically spend excess for additional votes. */
         emit Dispute(arbitrator, disputeID, metaEvidenceUpdates - 1, uint256(_questionID)); // We use _questionID in uint as evidence group identifier.
         emit DisputeIDToQuestionID(disputeID, _questionID); // For the dynamic script https://github.com/kleros/realitio-script/blob/master/src/index.js
         externalIDtoLocalID[disputeID] = uint256(_questionID);
@@ -142,8 +139,6 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
 
         // Notify Realitio
         realitio.notifyOfArbitrationRequest(_questionID, msg.sender, _maxPrevious);
-
-        msg.sender.send(msg.value.subCap(arbitrationCost)); // Return excess msg.value to sender.
     }
 
     /** @dev Receives ruling from Kleros and enforces it.
