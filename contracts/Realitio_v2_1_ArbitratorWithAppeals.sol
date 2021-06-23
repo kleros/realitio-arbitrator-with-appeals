@@ -27,13 +27,15 @@ contract Realitio_v2_1_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
      *  @param _metadata The metadata required for RealitioArbitrator.
      *  @param _arbitrator The address of the ERC792 arbitrator.
      *  @param _arbitratorExtraData The extra data used to raise a dispute in the ERC792 arbitrator.
+     *  @param _metaevidence Metaevidence as defined in ERC-1497.
      */
     constructor(
         IRealitio _realitio,
         string memory _metadata,
         IArbitrator _arbitrator,
-        bytes memory _arbitratorExtraData
-    ) RealitioArbitratorWithAppealsBase(_realitio, _metadata, _arbitrator, _arbitratorExtraData) {}
+        bytes memory _arbitratorExtraData,
+        string memory _metaevidence
+    ) RealitioArbitratorWithAppealsBase(_realitio, _metadata, _arbitrator, _arbitratorExtraData, _metadata) {}
 
     /** @dev Reports the answer to a specified question from the Kleros arbitrator to the Realitio v2.1 contract.
      *  This can be called by anyone, after the dispute gets a ruling from Kleros.
@@ -54,7 +56,8 @@ contract Realitio_v2_1_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
 
         arbitrationRequest.status = Status.Reported;
 
-        // Note that answer(ruling) is shifted by -1 before calling Realitio.
+        // Note that answer(ruling) is shifted by -1 before calling Realitio. This works because 0-1 is equivalent to type(uint256).max. However, this won't be the case starting from Solidity 0.8.x.
+        // https://docs.soliditylang.org/en/v0.8.0/080-breaking-changes.html
         realitio.assignWinnerAndSubmitAnswerByArbitrator(_questionID, bytes32(arbitrationRequest.answer - 1), arbitrationRequest.requester, _lastHistoryHash, _lastAnswerOrCommitmentID, _lastAnswerer);
     }
 }

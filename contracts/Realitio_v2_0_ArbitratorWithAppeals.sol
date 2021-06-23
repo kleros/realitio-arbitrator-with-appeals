@@ -28,13 +28,15 @@ contract Realitio_v2_0_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
      *  @param _metadata The metadata required for RealitioArbitrator.
      *  @param _arbitrator The address of the ERC792 arbitrator.
      *  @param _arbitratorExtraData The extra data used to raise a dispute in the ERC792 arbitrator.
+     *  @param _metaevidence Metaevidence as defined in ERC-1497.
      */
     constructor(
         IRealitio _realitio,
         string memory _metadata,
         IArbitrator _arbitrator,
-        bytes memory _arbitratorExtraData
-    ) RealitioArbitratorWithAppealsBase(_realitio, _metadata, _arbitrator, _arbitratorExtraData) {}
+        bytes memory _arbitratorExtraData,
+        string memory _metaevidence
+    ) RealitioArbitratorWithAppealsBase(_realitio, _metadata, _arbitrator, _arbitratorExtraData, _metaevidence) {}
 
     /** @dev Compute winner and report the answer to a specified question from the ERC792 arbitrator to the Realitio v2.0 contract. TRUSTED.
      *  @param _questionID The ID of the question.
@@ -98,6 +100,7 @@ contract Realitio_v2_0_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
             isAnswered = true;
         }
 
+        // Note that 0-1=type(uint256).max. However starting from Solidity 0.8.x this won't be the case. https://docs.soliditylang.org/en/v0.8.0/080-breaking-changes.html
         return isAnswered && lastAnswer == bytes32(_arbitrationRequest.answer - 1) ? _lastAnswerer : _arbitrationRequest.requester;
     }
 }
