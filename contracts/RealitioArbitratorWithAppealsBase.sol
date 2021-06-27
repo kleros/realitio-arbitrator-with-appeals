@@ -280,7 +280,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         uint256,
         uint256[] memory
     ) public pure override {
-        return;
+        revert("Not implemented.");
     }
 
     /** @dev Allows to withdraw any reimbursable fees or rewards after the dispute gets solved.
