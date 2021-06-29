@@ -35,7 +35,7 @@ contract Realitio_v2_1_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
         IArbitrator _arbitrator,
         bytes memory _arbitratorExtraData,
         string memory _metaevidence
-    ) RealitioArbitratorWithAppealsBase(_realitio, _metadata, _arbitrator, _arbitratorExtraData, _metadata) {}
+    ) RealitioArbitratorWithAppealsBase(_realitio, _metadata, _arbitrator, _arbitratorExtraData, _metaevidence) {}
 
     /** @dev Reports the answer to a specified question from the Kleros arbitrator to the Realitio v2.1 contract.
      *  This can be called by anyone, after the dispute gets a ruling from Kleros.

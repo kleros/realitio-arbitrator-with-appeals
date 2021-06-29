@@ -163,28 +163,26 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         require(arbitrationRequest.status == Status.Disputed, "No dispute to appeal.");
 
         uint256 currentRuling = arbitrator.currentRuling(disputeID);
-
-        {
-            /* Check appeal period */
-            (uint256 originalStart, uint256 originalEnd) = arbitrator.appealPeriod(disputeID);
-
-            if (currentRuling == _ruling) {
-                require(block.timestamp < originalEnd, "Funding must be made within the appeal period.");
-            } else {
-                require(block.timestamp < (originalStart + ((originalEnd - originalStart) / 2)), "Funding must be made within the first half appeal period.");
-            }
-        }
-
         uint256 originalCost;
         uint256 totalCost;
         {
+            /* Check appeal period */
+            (uint256 originalStart, uint256 originalEnd) = arbitrator.appealPeriod(disputeID);
             /* Calculate appeal costs */
             uint256 multiplier;
-            if (_ruling == currentRuling) multiplier = WINNER_STAKE_MULTIPLIER;
-            else multiplier = LOSER_STAKE_MULTIPLIER;
 
-            uint256 appealFee = arbitrator.appealCost(disputeID, arbitratorExtraData);
-            (originalCost, totalCost) = (appealFee, appealFee.addCap(appealFee.mulCap(multiplier) / MULTIPLIER_DENOMINATOR));
+            if (_ruling == currentRuling) {
+                require(block.timestamp < originalEnd, "Funding must be made within the appeal period.");
+
+                multiplier = WINNER_STAKE_MULTIPLIER;
+            } else {
+                require(block.timestamp < (originalStart + ((originalEnd - originalStart) / 2)), "Funding must be made within the first half appeal period.");
+
+                multiplier = LOSER_STAKE_MULTIPLIER;
+            }
+
+            originalCost = arbitrator.appealCost(disputeID, arbitratorExtraData);
+            totalCost = originalCost.addCap(originalCost.mulCap(multiplier) / MULTIPLIER_DENOMINATOR);
         }
 
         uint256 lastRoundIndex = arbitrationRequest.rounds.length - 1;
@@ -330,7 +328,9 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
 
         for (uint256 roundNumber = 0; roundNumber < noOfRounds; roundNumber++) {
             Round storage round = arbitrationRequest.rounds[roundNumber];
-            sum += getWithdrawableAmount(round, _contributor, _contributedTo[0], finalRuling);
+            for (uint256 contributionNumber = 0; contributionNumber < _contributedTo.length; contributionNumber++) {
+                sum += getWithdrawableAmount(round, _contributor, _contributedTo[contributionNumber], finalRuling);
+            }
         }
     }
 
