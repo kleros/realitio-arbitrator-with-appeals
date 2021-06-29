@@ -171,8 +171,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
             if (currentRuling == _ruling) {
                 require(block.timestamp < originalEnd, "Funding must be made within the appeal period.");
             } else {
-                // Magic number 2 = LOSER_APPEAL_PERIOD_MULTIPLIER / DENOMINATOR
-                require(block.timestamp < (originalStart + ((originalEnd - originalStart) / 2)), "Funding must be made within the appeal period.");
+                require(block.timestamp < (originalStart + ((originalEnd - originalStart) / 2)), "Funding must be made within the first half appeal period.");
             }
         }
 
