@@ -360,25 +360,4 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
             }
         }
     }
-
-    /** @dev Retrieves appeal cost for each ruling. It extends the function with the same name on the arbitrator side by adding
-     *  _ruling parameter because required amount depends on multipliers.
-     *  @param _disputeID The dispute this function returns the appeal cost for.
-     *  @param _ruling The ruling option which the caller wants to return the appeal cost for.
-     *  @param _currentRuling Latest Kleros decision on this dispute.
-     *  @return appealFee_ Arbitration fee to be paid for this appeal round.
-     *  @return totalCost_ Total amount required for this appeal round. This includes arbitration fee plus stake deposits.
-     */
-    function appealCost(
-        uint256 _disputeID,
-        uint256 _ruling,
-        uint256 _currentRuling
-    ) internal view returns (uint256 appealFee_, uint256 totalCost_) {
-        uint256 multiplier;
-        if (_ruling == _currentRuling) multiplier = WINNER_STAKE_MULTIPLIER;
-        else multiplier = LOSER_STAKE_MULTIPLIER;
-
-        uint256 appealFee = arbitrator.appealCost(_disputeID, arbitratorExtraData);
-        return (appealFee, appealFee.addCap(appealFee.mulCap(multiplier) / MULTIPLIER_DENOMINATOR));
-    }
 }
