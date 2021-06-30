@@ -159,8 +159,8 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
     function fundAppeal(uint256 _questionID, uint256 _ruling) external payable override returns (bool fullyFunded) {
         require(_ruling <= NUMBER_OF_RULING_OPTIONS, "Answer is out of bounds");
         ArbitrationRequest storage arbitrationRequest = arbitrationRequests[_questionID];
-        uint256 disputeID = arbitrationRequest.disputeID;
         require(arbitrationRequest.status == Status.Disputed, "No dispute to appeal.");
+        uint256 disputeID = arbitrationRequest.disputeID;
 
         uint256 currentRuling = arbitrator.currentRuling(disputeID);
         uint256 originalCost;
