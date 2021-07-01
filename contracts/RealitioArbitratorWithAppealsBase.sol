@@ -130,11 +130,12 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
      *  @param _ruling Ruling that is given by Kleros. This needs to be converted to Realitio answer before reporting the answer by shifting by 1.
      */
     function rule(uint256 _disputeID, uint256 _ruling) public override {
+        require(IArbitrator(msg.sender) == arbitrator, "Only arbitrator allowed");
+        require(_ruling <= NUMBER_OF_RULING_OPTIONS, "Invalid ruling");
+
         uint256 questionID = externalIDtoLocalID[_disputeID];
         ArbitrationRequest storage arbitrationRequest = arbitrationRequests[questionID];
 
-        require(IArbitrator(msg.sender) == arbitrator, "Only arbitrator allowed");
-        require(_ruling <= NUMBER_OF_RULING_OPTIONS, "Invalid ruling");
         require(arbitrationRequest.status == Status.Disputed, "Invalid arbitration status");
 
         Round storage round = arbitrationRequest.rounds[arbitrationRequest.rounds.length - 1];
@@ -160,8 +161,8 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         require(_ruling <= NUMBER_OF_RULING_OPTIONS, "Answer is out of bounds");
         ArbitrationRequest storage arbitrationRequest = arbitrationRequests[_questionID];
         require(arbitrationRequest.status == Status.Disputed, "No dispute to appeal.");
-        uint256 disputeID = arbitrationRequest.disputeID;
 
+        uint256 disputeID = arbitrationRequest.disputeID;
         uint256 currentRuling = arbitrator.currentRuling(disputeID);
         uint256 originalCost;
         uint256 totalCost;
@@ -249,8 +250,8 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         return (WINNER_STAKE_MULTIPLIER, LOSER_STAKE_MULTIPLIER, LOSER_APPEAL_PERIOD_MULTIPLIER, MULTIPLIER_DENOMINATOR);
     }
 
-    /** @dev Allows to withdraw any rewards or reimbursable fees after the dispute gets resolved. For multiple rulings options and for all rounds at once.
-     *  This function has O(m*n) time complexity where m is number of rounds and n is the number of ruling options contributed by given user.
+    /** @dev Allows to withdraw any rewards or reimbursable fees after the dispute gets resolved. For all rounds at once.
+     *  This function has O(m) time complexity where m is number of rounds.
      *  It is safe to assume m is always less than 10 as appeal cost growth order is O(m^2).
      *  @param _questionID Identifier of the Realitio question, casted to uint. This also serves as the local identifier in this contract.
      *  @param _contributor The address whose rewards to withdraw.
@@ -294,10 +295,9 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         uint256 _ruling
     ) public override returns (uint256 amount) {
         ArbitrationRequest storage arbitrationRequest = arbitrationRequests[_questionID];
+        require(arbitrationRequest.status > Status.Disputed, "There is no ruling yet.");
 
         Round storage round = arbitrationRequest.rounds[_roundNumber];
-
-        require(arbitrationRequest.status > Status.Disputed, "There is no ruling yet.");
 
         amount = getWithdrawableAmount(round, _contributor, _ruling, arbitrationRequest.answer);
 
