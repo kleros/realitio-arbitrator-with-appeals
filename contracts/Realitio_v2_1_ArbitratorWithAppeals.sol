@@ -56,8 +56,8 @@ contract Realitio_v2_1_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
 
         arbitrationRequest.status = Status.Reported;
 
-        // Note that answer(ruling) is shifted by -1 before calling Realitio. This works because 0-1 is equivalent to type(uint256).max. However, this won't be the case starting from Solidity 0.8.x.
+        // Note that ruling is shifted by -1 before calling Realitio. This works because 0-1 is equivalent to type(uint256).max. However, this won't be the case starting from Solidity 0.8.x.
         // https://docs.soliditylang.org/en/v0.8.0/080-breaking-changes.html
-        realitio.assignWinnerAndSubmitAnswerByArbitrator(_questionID, bytes32(arbitrationRequest.answer - 1), arbitrationRequest.requester, _lastHistoryHash, _lastAnswerOrCommitmentID, _lastAnswerer);
+        realitio.assignWinnerAndSubmitAnswerByArbitrator(_questionID, bytes32(arbitrationRequest.ruling - 1), arbitrationRequest.requester, _lastHistoryHash, _lastAnswerOrCommitmentID, _lastAnswerer);
     }
 }

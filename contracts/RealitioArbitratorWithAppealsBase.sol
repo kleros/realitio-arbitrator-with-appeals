@@ -48,7 +48,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         Status status; // The current status of the question.
         address requester; // The address that requested the arbitration.
         uint256 disputeID; // The ID of the dispute raised in the arbitrator contract.
-        uint256 answer; // The ruling given by the arbitrator.
+        uint256 ruling; // The ruling given by the arbitrator.
         Round[] rounds; // Tracks each appeal round of a dispute.
     }
 
@@ -93,7 +93,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
 
     /** @dev Allows to submit evidence for a given dispute.
      *  @param _questionID Realitio question identifier.
-     *  @param  _evidenceURI Link to evidence.
+     *  @param _evidenceURI Link to evidence.
      */
     function submitEvidence(uint256 _questionID, string calldata _evidenceURI) external override {
         emit Evidence(arbitrator, _questionID, msg.sender, _evidenceURI); // We use _questionID for evidence group identifier.
@@ -143,7 +143,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         // If there is only one ruling option in last round that is fully funded, no matter what Kleros ruling was this ruling option is the winner by default.
         uint256 finalRuling = (round.fundedRulings.length == 1) ? round.fundedRulings[0] : _ruling;
 
-        arbitrationRequest.answer = finalRuling;
+        arbitrationRequest.ruling = finalRuling;
         arbitrationRequest.status = Status.Ruled;
 
         // Notify Kleros
@@ -167,9 +167,8 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         uint256 originalCost;
         uint256 totalCost;
         {
-            /* Check appeal period */
             (uint256 originalStart, uint256 originalEnd) = arbitrator.appealPeriod(disputeID);
-            /* Calculate appeal costs */
+
             uint256 multiplier;
 
             if (_ruling == currentRuling) {
@@ -234,7 +233,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
      *  @return _WINNER_STAKE_MULTIPLIER Winners stake multiplier.
      *  @return _LOSER_STAKE_MULTIPLIER Losers stake multiplier.
      *  @return _LOSER_APPEAL_PERIOD_MULTIPLIER Losers appeal period multiplier. The loser is given less time to fund its appeal to defend against last minute appeal funding attacks.
-     *  @return _denominator Multiplier denominator in basis points. Required for achieving floating-point-like behavior.
+     *  @return _DENOMINATOR Multiplier denominator in basis points. Required for achieving floating-point-like behavior.
      */
     function getMultipliers()
         external
@@ -244,7 +243,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
             uint256 _WINNER_STAKE_MULTIPLIER,
             uint256 _LOSER_STAKE_MULTIPLIER,
             uint256 _LOSER_APPEAL_PERIOD_MULTIPLIER,
-            uint256 _denominator
+            uint256 _DENOMINATOR
         )
     {
         return (WINNER_STAKE_MULTIPLIER, LOSER_STAKE_MULTIPLIER, LOSER_APPEAL_PERIOD_MULTIPLIER, MULTIPLIER_DENOMINATOR);
@@ -299,7 +298,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
 
         Round storage round = arbitrationRequest.rounds[_roundNumber];
 
-        amount = getWithdrawableAmount(round, _contributor, _ruling, arbitrationRequest.answer);
+        amount = getWithdrawableAmount(round, _contributor, _ruling, arbitrationRequest.ruling);
 
         if (amount != 0) {
             round.contributions[_contributor][_ruling] = 0;
@@ -324,7 +323,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         ArbitrationRequest storage arbitrationRequest = arbitrationRequests[_questionID];
         if (arbitrationRequest.status < Status.Ruled) return 0;
         uint256 noOfRounds = arbitrationRequest.rounds.length;
-        uint256 finalRuling = arbitrationRequest.answer;
+        uint256 finalRuling = arbitrationRequest.ruling;
 
         for (uint256 roundNumber = 0; roundNumber < noOfRounds; roundNumber++) {
             Round storage round = arbitrationRequest.rounds[roundNumber];
@@ -338,6 +337,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
      *  @param _round The round to calculate amount for.
      *  @param _contributor The contributor for which to query.
      *  @param _contributedTo The ruling option to search for potential withdrawal.
+     *  @param _finalRuling Final ruling given by arbitrator.
      *  @return amount Amount available to withdraw for given ruling option.
      */
     function getWithdrawableAmount(
@@ -350,12 +350,12 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
             // Allow to reimburse if funding was unsuccessful for this ruling option.
             amount = _round.contributions[_contributor][_contributedTo];
         } else {
-            //Funding was successful for this ruling option.
+            // Funding was successful for this ruling option.
             if (_contributedTo == _finalRuling) {
                 // This ruling option is the ultimate winner.
                 amount = _round.paidFees[_contributedTo] > 0 ? (_round.contributions[_contributor][_contributedTo] * _round.feeRewards) / _round.paidFees[_contributedTo] : 0;
             } else if (!_round.hasPaid[_finalRuling]) {
-                // The ultimate winner was not funded in this round. In this case funded ruling option(s) wins by default. Prize is distributed among contributors of funded ruling option(s).
+                // The ultimate winner was not funded in this round. Contributions discounting the appeal fee are reimbursed proportionally.
                 amount = (_round.contributions[_contributor][_contributedTo] * _round.feeRewards) / (_round.paidFees[_round.fundedRulings[0]] + _round.paidFees[_round.fundedRulings[1]]);
             }
         }

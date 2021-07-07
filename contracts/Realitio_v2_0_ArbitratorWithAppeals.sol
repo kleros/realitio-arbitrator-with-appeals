@@ -63,7 +63,9 @@ contract Realitio_v2_0_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
 
         arbitrationRequest.status = Status.Reported;
 
-        realitio.submitAnswerByArbitrator(_questionID, bytes32(arbitrationRequest.answer - 1), computeWinner(arbitrationRequest, _lastAnswerOrCommitmentID, _lastBond, _lastAnswerer, _isCommitment));
+        // Note that ruling is shifted by -1 before calling Realitio. This works because 0-1 is equivalent to type(uint256).max. However, this won't be the case starting from Solidity 0.8.x.
+        // https://docs.soliditylang.org/en/v0.8.0/080-breaking-changes.html
+        realitio.submitAnswerByArbitrator(_questionID, bytes32(arbitrationRequest.ruling - 1), computeWinner(arbitrationRequest, _lastAnswerOrCommitmentID, _lastBond, _lastAnswerer, _isCommitment));
     }
 
     /** @dev Computes the Realitio answerer, of a specified question, that should win. This function is needed to avoid the "stack too deep error". TRUSTED.
@@ -101,6 +103,6 @@ contract Realitio_v2_0_ArbitratorWithAppeals is RealitioArbitratorWithAppealsBas
         }
 
         // Note that 0-1=type(uint256).max. However starting from Solidity 0.8.x this won't be the case. https://docs.soliditylang.org/en/v0.8.0/080-breaking-changes.html
-        return isAnswered && lastAnswer == bytes32(_arbitrationRequest.answer - 1) ? _lastAnswerer : _arbitrationRequest.requester;
+        return isAnswered && lastAnswer == bytes32(_arbitrationRequest.ruling - 1) ? _lastAnswerer : _arbitrationRequest.requester;
     }
 }
