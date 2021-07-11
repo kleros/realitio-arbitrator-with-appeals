@@ -250,7 +250,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
 
     /** @dev Allows to withdraw any rewards or reimbursable fees after the dispute gets resolved. For all rounds at once.
      *  This function has O(m) time complexity where m is number of rounds.
-     *  It is safe to assume m is always less than 10 as appeal cost growth order is O(m^2).
+     *  It is safe to assume m is always less than 10 as appeal cost growth order is O(2^m).
      *  @param _questionID Identifier of the Realitio question, casted to uint. This also serves as the local identifier in this contract.
      *  @param _contributor The address whose rewards to withdraw.
      *  @param _ruling Ruling that received contributions from contributor.
