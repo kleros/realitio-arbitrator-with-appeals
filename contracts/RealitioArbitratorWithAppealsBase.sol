@@ -5,7 +5,6 @@
  *  @reviewers: [@unknownunknown1*, @hbarcelos*, @MerlinEgalite*, @shalzz, @fnanni-0]
  *  @auditors: []
  *  @bounties: []
- *  @deployments: []
  */
 
 pragma solidity ^0.7.0;
@@ -254,30 +253,19 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
      *  It is safe to assume m is always less than 10 as appeal cost growth order is O(m^2).
      *  @param _questionID Identifier of the Realitio question, casted to uint. This also serves as the local identifier in this contract.
      *  @param _contributor The address whose rewards to withdraw.
-     *  @param _contributedTo Rulings that received contributions from contributor.
+     *  @param _ruling Ruling that received contributions from contributor.
      */
     function withdrawFeesAndRewardsForAllRounds(
         uint256 _questionID,
         address payable _contributor,
-        uint256[] memory _contributedTo
+        uint256 _ruling
     ) external override {
         ArbitrationRequest storage arbitrationRequest = arbitrationRequests[_questionID];
         uint256 noOfRounds = arbitrationRequest.rounds.length;
 
         for (uint256 roundNumber = 0; roundNumber < noOfRounds; roundNumber++) {
-            withdrawFeesAndRewards(_questionID, _contributor, roundNumber, _contributedTo[0]); // We ignore other ruling options as it's a rare usecase.
+            withdrawFeesAndRewards(_questionID, _contributor, roundNumber, _ruling); // We ignore other ruling options as it's a rare usecase.
         }
-    }
-
-    /** @dev Not implemented.
-     */
-    function withdrawFeesAndRewardsForMultipleRulings(
-        uint256,
-        address payable,
-        uint256,
-        uint256[] memory
-    ) public pure override {
-        revert("Not implemented.");
     }
 
     /** @dev Allows to withdraw any reimbursable fees or rewards after the dispute gets solved.
@@ -308,17 +296,17 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
     }
 
     /** @dev Returns the sum of withdrawable amount.
-     *  This function has O(m*n) time complexity where m is number of rounds and n is the number of ruling options contributed by given user.
+     *  This function has O(m) time complexity where m is number of rounds.
      *  It is safe to assume m is always less than 10 as appeal cost growth order is O(m^2).
      *  @param _questionID Identifier of the Realitio question, casted to uint. This also serves as the local identifier in this contract.
      *  @param _contributor The contributor for which to query.
-     *  @param _contributedTo Ruling options to look for potential withdrawals.
+     *  @param _ruling Ruling options to look for potential withdrawals.
      *  @return sum The total amount available to withdraw.
      */
     function getTotalWithdrawableAmount(
         uint256 _questionID,
         address payable _contributor,
-        uint256[] memory _contributedTo
+        uint256 _ruling
     ) external view override returns (uint256 sum) {
         ArbitrationRequest storage arbitrationRequest = arbitrationRequests[_questionID];
         if (arbitrationRequest.status < Status.Ruled) return 0;
@@ -327,36 +315,34 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
 
         for (uint256 roundNumber = 0; roundNumber < noOfRounds; roundNumber++) {
             Round storage round = arbitrationRequest.rounds[roundNumber];
-            for (uint256 contributionNumber = 0; contributionNumber < _contributedTo.length; contributionNumber++) {
-                sum += getWithdrawableAmount(round, _contributor, _contributedTo[contributionNumber], finalRuling);
-            }
+            sum += getWithdrawableAmount(round, _contributor, _ruling, finalRuling);
         }
     }
 
     /** @dev Returns withdrawable amount for given parameters.
      *  @param _round The round to calculate amount for.
      *  @param _contributor The contributor for which to query.
-     *  @param _contributedTo The ruling option to search for potential withdrawal.
+     *  @param _ruling The ruling option to search for potential withdrawal.
      *  @param _finalRuling Final ruling given by arbitrator.
      *  @return amount Amount available to withdraw for given ruling option.
      */
     function getWithdrawableAmount(
         Round storage _round,
         address _contributor,
-        uint256 _contributedTo,
+        uint256 _ruling,
         uint256 _finalRuling
     ) internal view returns (uint256 amount) {
-        if (!_round.hasPaid[_contributedTo]) {
+        if (!_round.hasPaid[_ruling]) {
             // Allow to reimburse if funding was unsuccessful for this ruling option.
-            amount = _round.contributions[_contributor][_contributedTo];
+            amount = _round.contributions[_contributor][_ruling];
         } else {
             // Funding was successful for this ruling option.
-            if (_contributedTo == _finalRuling) {
+            if (_ruling == _finalRuling) {
                 // This ruling option is the ultimate winner.
-                amount = _round.paidFees[_contributedTo] > 0 ? (_round.contributions[_contributor][_contributedTo] * _round.feeRewards) / _round.paidFees[_contributedTo] : 0;
+                amount = _round.paidFees[_ruling] > 0 ? (_round.contributions[_contributor][_ruling] * _round.feeRewards) / _round.paidFees[_ruling] : 0;
             } else if (!_round.hasPaid[_finalRuling]) {
                 // The ultimate winner was not funded in this round. Contributions discounting the appeal fee are reimbursed proportionally.
-                amount = (_round.contributions[_contributor][_contributedTo] * _round.feeRewards) / (_round.paidFees[_round.fundedRulings[0]] + _round.paidFees[_round.fundedRulings[1]]);
+                amount = (_round.contributions[_contributor][_ruling] * _round.feeRewards) / (_round.paidFees[_round.fundedRulings[0]] + _round.paidFees[_round.fundedRulings[1]]);
             }
         }
     }
