@@ -2,7 +2,7 @@
 
 /**
  *  @authors: [@ferittuncer]
- *  @reviewers: [@unknownunknown1*, @hbarcelos*, @MerlinEgalite*, @shalzz*, @fnanni-0*]
+ *  @reviewers: [@unknownunknown1*, @hbarcelos*, @MerlinEgalite*, @shalzz*, @fnanni-0*, @clesaege]
  *  @auditors: []
  *  @bounties: []
  */
@@ -145,7 +145,6 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         arbitrationRequest.ruling = finalRuling;
         arbitrationRequest.status = Status.Ruled;
 
-        // Notify Kleros
         emit Ruling(IArbitrator(msg.sender), _disputeID, finalRuling);
 
         // Ready to call `reportAnswer` now.
@@ -264,7 +263,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         uint256 noOfRounds = arbitrationRequest.rounds.length;
 
         for (uint256 roundNumber = 0; roundNumber < noOfRounds; roundNumber++) {
-            withdrawFeesAndRewards(_questionID, _contributor, roundNumber, _ruling); // We ignore other ruling options as it's a rare usecase.
+            withdrawFeesAndRewards(_questionID, _contributor, roundNumber, _ruling);
         }
     }
 
@@ -300,7 +299,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
      *  It is safe to assume m is always less than 10 as appeal cost growth order is O(m^2).
      *  @param _questionID Identifier of the Realitio question, casted to uint. This also serves as the local identifier in this contract.
      *  @param _contributor The contributor for which to query.
-     *  @param _ruling Ruling options to look for potential withdrawals.
+     *  @param _ruling Ruling option to look for potential withdrawals.
      *  @return sum The total amount available to withdraw.
      */
     function getTotalWithdrawableAmount(
