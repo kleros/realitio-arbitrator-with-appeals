@@ -67,4 +67,4 @@ Example metaevidence:
   "dynamicScriptURI": "/ipfs/QmSG1jvoScL99YSyzkSArd8w31moiW4BheUXvJNfPneduC/bundle.js"
 }
 ```
-After completing these for the [migration script](https://github.com/kleros/realitio-arbitrator-with-appeals/blob/master/migrations/2_deploy_ra.js) finally, this command will deploy and verify source code: `INFURA_PROJECT_ID=$INFURA_PROJECT_ID WALLET_KEY=$PRIVATE_KEY_OF_DEPLOYING_ACC ETHERSCAN=$ETHERSCAN_API_KEY NETWORK=$NETWORK_FROM_TRUFFLE_CONFIG yarn deploy-and-verify`
+After completing these for the [migration script](https://github.com/kleros/realitio-arbitrator-with-appeals/blob/master/migrations/2_deploy_ra.js), finally, this command will deploy and verify source code: `INFURA_PROJECT_ID=$INFURA_PROJECT_ID WALLET_KEY=$PRIVATE_KEY_OF_DEPLOYING_ACC ETHERSCAN=$ETHERSCAN_API_KEY NETWORK=$NETWORK_FROM_TRUFFLE_CONFIG yarn deploy-and-verify`
