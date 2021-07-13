@@ -3,42 +3,42 @@ A [Realitio v2](https://github.com/realitio/realitio-contracts/blob/master/truff
 
 ```
 /*
-             Kleros                                   RealitioArbitratorWithAppeals                            Realitio
-          <IArbitrator>                                    <IArbitrator>
-                                                           <IArbitrable>
-                                                           <IRealitioArbitrator>
-                                                           <IDisputeResolver>
+             Kleros                         RealitioArbitratorWithAppeals                         Realitio
+          <IArbitrator>                          <IArbitrator>
+                                                 <IArbitrable>
+                                                 <IRealitioArbitrator>
+                                                 <IDisputeResolver>
 
 
- ┌──────────────────────────────┐        ┌─────────────────────────────────┐       ┌────────────────────────────────────────────────────┐
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │   createDispute() ◄──────────┼──1─────┼───────  requestArbitration──────┼───1───┼─────►  notifyOfArbitrationRequest()                │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │   executeRuling() ───────────┼───4────┼───────►  rule() ────────────────┼───────┼──►   assignWinnerAndSubmitAnswerByArbitrator()     │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │    appeal()  ◄───────────────┼───3────┼────────  fundAppeal()           │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- │                              │        │                                 │       │                                                    │
- └──────────────────────────────┘        └─────────────────────────────────┘       └────────────────────────────────────────────────────┘
+ ┌──────────────────────────────┐        ┌─────────────────────────────────┐       ┌──────────────────────────────────────┐
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │   createDispute() ◄──────────┼──1─────┼───────  requestArbitration──────┼───1───┼─────►  notifyOfArbitrationRequest()  │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │   executeRuling() ───────────┼───4────┼───────►  rule() ────────────────┼───────┼──►   assignWinnerAnd                 │
+ │                              │        │                                 │       │      submitAnswerByArbitrator()      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │    appeal()  ◄───────────────┼───3────┼────────  fundAppeal()           │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ └──────────────────────────────┘        └─────────────────────────────────┘       └──────────────────────────────────────┘
 
 
 1 User calls requestArbitration(). Internal calls to createDispute() and notifyOfArbitrationRequest().
