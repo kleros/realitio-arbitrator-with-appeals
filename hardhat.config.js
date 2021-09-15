@@ -22,38 +22,54 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.8.4",
+  solidity: {
+    compilers: [
+      {
+        version: "0.8.4",
+      },
+      {
+        version: "0.7.6",
+        settings: {},
+      },
+    ],
+  },
+  paths: {
+    sources: "./contracts",
+    tests: "./test",
+    cache: "./cache",
+    artifacts: "./artifacts",
+  },
   networks: {
     main: {
-      chainId: "1",
-      url: `https://infura.io/v3/${process.env.INFURA_PROJECT_ID}` || "",
+      chainId: 1,
+      url: `https://infura.io/v3/${process.env?.INFURA_PROJECT_ID}` || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     hardhat: {
       initialBaseFeePerGas: 0, // workaround from https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136 . Remove when that issue is closed.
     },
     ropsten: {
-      chainId: "3",
-      url: `https://ropsten.infura.io/v3/${process.env.INFURA_PROJECT_ID}` || "",
+      chainId: 3,
+      url: `https://ropsten.infura.io/v3/${process.env?.INFURA_PROJECT_ID}` || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     rinkeby: {
-      chainId: "4",
-      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_PROJECT_ID}` || "",
+      chainId: 4,
+      url: `https://rinkeby.infura.io/v3/${process.env?.INFURA_PROJECT_ID}` || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     kovan: {
-      chainId: "42",
-      url: `https://kovan.infura.io/v3/${process.env.INFURA_PROJECT_ID}` || "",
+      chainId: 42,
+      url: `https://kovan.infura.io/v3/${process.env?.INFURA_PROJECT_ID}` || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     sokol: {
-      chainId: "77",
+      chainId: 77,
       url: "https://sokol.poa.network" || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     xdai: {
-      chainId: "100",
+      chainId: 100,
       url: "https://rpc.xdaichain.com" || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },

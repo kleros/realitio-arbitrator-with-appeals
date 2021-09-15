@@ -17,8 +17,7 @@
   "scripts": {
     "compile": "hardhat compile",
     "node": "hardhat node",
-    "test": "truffle test",
-    "run-script": "hardhat run $SCRIPT_PATH"
+    "test": "truffle test"
   },
   "files": [
     "build",
