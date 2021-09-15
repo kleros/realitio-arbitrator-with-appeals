@@ -7,17 +7,7 @@
   "license": "MIT",
   "private": false,
   "devDependencies": {
-    "@openzeppelin/test-helpers": "^0.5.4",
-    "@truffle/hdwallet-provider": "^1.0.18",
-    "chai": "^4.2.0",
-    "eth-gas-reporter": "^0.2.17",
-    "ganache": "^6.4.4",
-    "ganache-cli": "^6.7.0",
-    "prettier": "^2.2.1",
-    "prettier-plugin-solidity": "^1.0.0-beta.3",
-    "surya": "^0.4.0",
-    "truffle": "^5.1.17",
-    "truffle-plugin-verify": "^0.5.7"
+    "hardhat": "^2.6.4"
   },
   "dependencies": {
     "@kleros/dispute-resolver-interface-contract": "^2.0.0",
@@ -25,18 +15,17 @@
     "@realitio/realitio-contracts": "2.2.8"
   },
   "scripts": {
-    "compile": "truffle compile",
-    "ganache": "ganache-cli -g 1 -l 1000000000",
+    "compile": "hardhat compile",
+    "node": "hardhat node",
     "test": "truffle test",
-    "prepack": "prettier --write 'contracts/**/*.sol' && NETWORK=kovan npm run deploy",
-    "deploy": "truffle migrate --reset --network $NETWORK && sleep 3 && truffle run verify Realitio_v2_0_ArbitratorWithAppeals --network $NETWORK"
+    "run-script": "hardhat run $SCRIPT_PATH"
   },
   "files": [
     "build",
     "contracts"
   ],
   "engines": {
-    "node": ">=0.12"
+    "node": ">=0.14"
   },
   "prettier": {
     "printWidth": 200,
@@ -53,5 +42,8 @@
         }
       }
     ]
+  },
+  "volta": {
+    "node": "14.17.6"
   }
 }
