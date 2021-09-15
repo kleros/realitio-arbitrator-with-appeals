@@ -23,7 +23,7 @@ async function main() {
   //
   // If this script is run directly using `node` you may want to call compile
   // manually to make sure everything is compiled
-  // await hre.run('compile');
+  await hre.run("compile");
 
   // We get the contract to deploy
   const RA21 = await hre.ethers.getContractFactory("Realitio_v2_1_ArbitratorWithAppeals");
