@@ -2,6 +2,8 @@
 
 A [Realitio](https://github.com/RealityETH/monorepo/blob/main/packages/contracts/development/contracts/Realitio_v2_1.sol) arbitrator that implements appeals via [IDisputeResolver](https://github.com/kleros/dispute-resolver-interface-contract). Implementing this interface ensures compatibility with https://resolve.kleros.io user interface.
 
+### The Flow
+
 ```
              Kleros                         RealitioArbitratorWithAppeals                         Realitio
           <IArbitrator>                          <IArbitrator>
