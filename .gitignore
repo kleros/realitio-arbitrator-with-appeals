@@ -105,3 +105,10 @@ dist
 
 # Built contracts
 build/
+
+node_modules
+.env
+
+#Hardhat files
+cache
+artifacts
