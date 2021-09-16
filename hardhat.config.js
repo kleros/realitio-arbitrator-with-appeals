@@ -1,7 +1,7 @@
-require("dotenv").config();
-
 require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-ethers");
+require("hardhat-deploy");
 require("hardhat-gas-reporter");
 require("solidity-coverage");
 
@@ -38,6 +38,7 @@ module.exports = {
     tests: "./test",
     cache: "./cache",
     artifacts: "./artifacts",
+    deploy: "./deploy",
   },
   networks: {
     main: {
@@ -60,7 +61,7 @@ module.exports = {
     },
     kovan: {
       chainId: 42,
-      url: `https://kovan.infura.io/v3/${process.env?.INFURA_PROJECT_ID}` || "",
+      url: `https://kovan.infura.io/v3/${process.env.INFURA_PROJECT_ID}` || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     sokol: {
