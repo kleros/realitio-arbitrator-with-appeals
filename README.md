@@ -1,42 +1,77 @@
-# Advanced Sample Hardhat Project
+# Realitio Arbitrator With Appeals
 
-This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
+A [Realitio](https://github.com/RealityETH/monorepo/blob/main/packages/contracts/development/contracts/Realitio_v2_1.sol) arbitrator that implements appeals via [IDisputeResolver](https://github.com/kleros/dispute-resolver-interface-contract). Implementing this interface ensures compatibility with https://resolve.kleros.io user interface.
 
-The project comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts. It also comes with a variety of other tools, preconfigured to work with the project code.
+```
+             Kleros                         RealitioArbitratorWithAppeals                         Realitio
+          <IArbitrator>                          <IArbitrator>
+                                                 <IArbitrable>
+                                                 <IRealitioArbitrator>
+                                                 <IDisputeResolver>
 
-Try running some of the following tasks:
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-npx hardhat help
-REPORT_GAS=true npx hardhat test
-npx hardhat coverage
-npx hardhat run scripts/deploy.js
-node scripts/deploy.js
-npx eslint '**/*.js'
-npx eslint '**/*.js' --fix
-npx prettier '**/*.{json,sol,md}' --check
-npx prettier '**/*.{json,sol,md}' --write
-npx solhint 'contracts/**/*.sol'
-npx solhint 'contracts/**/*.sol' --fix
+ ┌──────────────────────────────┐        ┌─────────────────────────────────┐       ┌──────────────────────────────────────┐
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │   createDispute() ◄──────────┼──1─────┼───────  requestArbitration──────┼───1───┼─────►  notifyOfArbitrationRequest()  │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │   executeRuling() ───────────┼───4────┼───────►  rule() ────────────────┼───────┼──►   assignWinnerAnd                 │
+ │                              │        │                                 │       │      submitAnswerByArbitrator()      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │    appeal()  ◄───────────────┼───3────┼────────  fundAppeal()           │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ │                              │        │                                 │       │                                      │
+ └──────────────────────────────┘        └─────────────────────────────────┘       └──────────────────────────────────────┘
+
+
+1 User calls requestArbitration(). Internal calls to createDispute() and notifyOfArbitrationRequest().
+2 Kleros jury decides. Ruling open for appeal.
+3 If any user wants to appeal, can do so by calling fundAppeal(). When total amount raised by both parties, appeal round starts.
+4 When ruling becomes finalized, user calls executeRuling(), causing internal calls to rule() and assignWinnerAndSubmitAnswerByArbitrator().
 ```
 
-# Etherscan verification
+### Compile
 
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
+`yarn compile`
 
-In this project, copy the .env.template file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
+### Deploy
 
-```shell
-hardhat run --network ropsten scripts/deploy.js
+Contract requires metaevidence during construction and metaevidence needs to know deployed contract address up-front, so it needs to be precomputed.
+
+For dynamic script, see here: https://github.com/kleros/realitio-script
+
+Reusable evidenceDisplayInterfaceURI: `/ipfs/QmQTnGNbRFpsS8zevPZTZA2ZioBKWM6u1HVCf9vLWkRuEH/index.html` You can just use this value for generating a new metaevidence, unless you want a new display interface.
+
+Example metaevidence:
+
+```
+{
+  "category": "Oracle",
+  "title": "Realitio Question",
+  "description": "A Realitio question has been raised to arbitration.",
+  "question": "Give an answer to the question.",
+  "evidenceDisplayInterfaceURI": "/ipfs/QmQTnGNbRFpsS8zevPZTZA2ZioBKWM6u1HVCf9vLWkRuEH/index.html",
+  "dynamicScriptURI": "/ipfs/QmSG1jvoScL99YSyzkSArd8w31moiW4BheUXvJNfPneduC/bundle.js"
+}
 ```
 
-Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
+After completing these for the [migration script](https://github.com/kleros/realitio-arbitrator-with-appeals/blob/master/migrations/2_deploy_ra.js), finally, this command will deploy and verify source code: `INFURA_PROJECT_ID=$INFURA_PROJECT_ID PRIVATE_KEY=$PRIVATE_KEY_OF_DEPLOYING_ACC ETHERSCAN=$ETHERSCAN_API_KEY yarn run hardhat deploy --network $NETWORK_NAME
 
-```shell
-npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
-```
+Deployment script will automatically verify the source code.

@@ -1,4 +1,6 @@
 module.exports = async ({ getNamedAccounts, deployments, getChainId, getUnnamedAccounts }) => {
+  // INFURA_PROJECT_ID, PRIVATE_KEY and ETHERSCAN environment variables are required for this task. See Hardhat configuation for more information.
+
   const { deploy } = deployments;
   const accounts = await getUnnamedAccounts();
   const deployer = accounts[0];
