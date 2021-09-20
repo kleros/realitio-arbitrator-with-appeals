@@ -4,19 +4,22 @@ require("@nomiclabs/hardhat-ethers");
 require("hardhat-deploy");
 require("hardhat-gas-reporter");
 require("solidity-coverage");
+const { BN, Address, toChecksumAddress } = require("ethereumjs-util");
 
-// This is a sample Hardhat task. To learn how to create your own go to
-// https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners();
-
-  for (const account of accounts) {
-    console.log(account.address);
-  }
-});
-
-// You need to export an object to set up your config
-// Go to https://hardhat.org/config/ to learn more
+task("compute-contract-address", "Computes contract address.")
+  .addParam("account", "The account's address")
+  .addOptionalParam("nonce", "Custom nonce. Default: next nonce.")
+  .setAction(async (taskArgs, { ethers, config, network }, hre) => {
+    let nonce;
+    if (!taskArgs.nonce) {
+      console.log("Fetching next nonce...");
+      const web3provider = new ethers.providers.JsonRpcProvider(network.config);
+      nonce = await web3provider.getTransactionCount(taskArgs.account);
+      console.log(`Nonce: ${nonce}`);
+    } else nonce = taskArgs.nonce;
+    const deployAddress = Address.generate(Address.fromString(taskArgs.account), new BN(String(nonce)));
+    console.log(`${toChecksumAddress(deployAddress.toString())}`);
+  });
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
