@@ -33,7 +33,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
     uint256 public constant LOSER_STAKE_MULTIPLIER = 7000; // Multiplier of the arbitration cost that the loser has to pay as fee stake for a round in basis points.
     uint256 public constant LOSER_APPEAL_PERIOD_MULTIPLIER = 5000; // Multiplier of the appeal period for losers (any other ruling options) in basis points. The loser is given less time to fund its appeal to defend against last minute appeal funding attacks.
     uint256 public constant MULTIPLIER_DENOMINATOR = 10000; // Denominator for multipliers.
-    uint256 private constant NUMBER_OF_RULING_OPTIONS = type(uint256).max - 1; // The amount of non 0 choices the arbitrator can give. The uint256(-1) number of choices can not be used in the current Kleros Court implementation.
+    uint256 private constant NUMBER_OF_RULING_OPTIONS = type(uint256).max; // The amount of non 0 choices the arbitrator can give. The uint256(-1) number of choices can not be used in the current Kleros Court implementation.
 
     enum Status {
         None, // The question hasn't been requested arbitration yet.

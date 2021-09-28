@@ -495,6 +495,24 @@
   resolved "https://registry.yarnpkg.com/@realitio/realitio-contracts/-/realitio-contracts-2.2.8.tgz#bacaacf1869171127edf86db013d9cfd1b1e4ce3"
   integrity sha512-dWn8xuuuVNDQNF5tmErOsPyoRh/KWr3rkGzpFsRbugCfsW+A1a887pG4Jde8SEFDW+QRmd2Ol87KO06qnUMDqQ==
 
+"@reality.eth/contracts@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@reality.eth/contracts/-/contracts-3.0.0.tgz#40ea235f71304789f9e6919ceedbf358a982b4a3"
+  integrity sha512-BnxaYdOrafcji2ar7ftR9U18dV+nta08jfXKNEtlh1uVHeJUJ2nEdzpixmZXh3oKMv1iVbNjKCGKY5Y2TI2liQ==
+  dependencies:
+    ethers "^5.4.6"
+
+"@reality.eth/reality-eth-lib@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@reality.eth/reality-eth-lib/-/reality-eth-lib-3.0.0.tgz#e6e5d2f44e2bd7c1f59677adc980c588a07069bc"
+  integrity sha512-gkrEKYwSMw30+a6laIOxMxxFjbAnDuNp2JflTMLe1kHokmMfgHPpm+vqxxucIM2NGTGJR/1/ZeWB2j0UzVN/Bg==
+  dependencies:
+    "@reality.eth/contracts" "^3.0.0"
+    bignumber.js "^7.2.1"
+    bn.js "^4.11.8"
+    ethereumjs-abi "^0.6.5"
+    sprintf-js "^1.1.1"
+
 "@sentry/core@5.30.0":
   version "5.30.0"
   resolved "https://registry.yarnpkg.com/@sentry/core/-/core-5.30.0.tgz#6b203664f69e75106ee8b5a2fe1d717379b331f3"
@@ -1027,6 +1045,11 @@ bech32@1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/bech32/-/bech32-1.1.4.tgz#e38c9f37bf179b8eb16ae3a772b40c356d4832e9"
   integrity sha512-s0IrSOzLlbvX7yp4WBfPITzpAU8sqQcpsmwXDiKwrG4r491vwCO/XpejasRNl0piBMe/DvP4Tz0mIS/X1DPJBQ==
+
+bignumber.js@^7.2.1:
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-7.2.1.tgz#80c048759d826800807c4bfd521e50edbba57a5f"
+  integrity sha512-S4XzBk5sMB+Rcb/LNcpzXr57VRTxgAvaAEDAl1AwRx27j00hT84O6OkteE7u8UB3NuaaygCRrEpqox4uDOrbdQ==
 
 bignumber.js@^9.0.0, bignumber.js@^9.0.1:
   version "9.0.1"
@@ -2003,7 +2026,7 @@ ethereum-cryptography@^0.1.2, ethereum-cryptography@^0.1.3:
     secp256k1 "^4.0.1"
     setimmediate "^1.0.5"
 
-ethereumjs-abi@0.6.8, ethereumjs-abi@^0.6.8:
+ethereumjs-abi@0.6.8, ethereumjs-abi@^0.6.5, ethereumjs-abi@^0.6.8:
   version "0.6.8"
   resolved "https://registry.yarnpkg.com/ethereumjs-abi/-/ethereumjs-abi-0.6.8.tgz#71bc152db099f70e62f108b7cdfca1b362c6fcae"
   integrity sha512-Tx0r/iXI6r+lRsdvkFDlut0N08jWMnKRZ6Gkq+Nmw75lZe4e6o3EkSnkaBP5NF6+m5PTGAr9JP43N3LyeoglsA==
@@ -3844,7 +3867,7 @@ node-environment-flags@1.0.6:
     object.getownpropertydescriptors "^2.0.3"
     semver "^5.7.0"
 
-node-fetch@^2.6.0:
+node-fetch@^2.0.0, node-fetch@^2.6.0:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.2.tgz#986996818b73785e47b1965cc34eb093a1d464d0"
   integrity sha512-aLoxToI6RfZ+0NOjmWAgn9+LEd30YCkJKFSyWacNZdEKTit/ZMcKjGkTRo8uWEsnIb/hfKecNPEbln02PdWbcA==
@@ -4779,6 +4802,11 @@ source-map@~0.2.0:
   integrity sha1-2rc/vPwrqBm03gO9b26qSBZLP50=
   dependencies:
     amdefine ">=0.0.4"
+
+sprintf-js@^1.1.1:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.1.2.tgz#da1765262bf8c0f571749f2ad6c26300207ae673"
+  integrity sha512-VE0SOVEHCk7Qc8ulkWw3ntAzXuqf7S2lvwQaDLRnUeIEaKNQJzV6BwmLKhOqT61aGhfUMrXeaBk+oDGCzvhcug==
 
 sprintf-js@~1.0.2:
   version "1.0.3"

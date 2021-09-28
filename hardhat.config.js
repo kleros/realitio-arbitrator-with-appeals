@@ -12,13 +12,16 @@ task("compute-contract-address", "Computes contract address.")
   .setAction(async (taskArgs, { ethers, config, network }, hre) => {
     let nonce;
     if (!taskArgs.nonce) {
-      console.log("Fetching next nonce...");
+      process.stdout.write("Fetching next nonce...\r");
       const web3provider = new ethers.providers.JsonRpcProvider(network.config);
       nonce = await web3provider.getTransactionCount(taskArgs.account);
-      console.log(`Nonce: ${nonce}`);
+      process.stdout.write(`Nonce: ${nonce}            \n`);
     } else nonce = taskArgs.nonce;
     const deployAddress = Address.generate(Address.fromString(taskArgs.account), new BN(String(nonce)));
-    console.log(`${toChecksumAddress(deployAddress.toString())}`);
+    const checksumAddress = toChecksumAddress(deployAddress.toString());
+
+    console.log(`If ${taskArgs.account} would deploy a contract in ${nonce}th transaction, it's address would be ${checksumAddress} .`);
+    return checksumAddress;
   });
 
 /**
