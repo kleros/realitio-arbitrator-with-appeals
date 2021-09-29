@@ -33,7 +33,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
     uint256 public constant LOSER_STAKE_MULTIPLIER = 7000; // Multiplier of the arbitration cost that the loser has to pay as fee stake for a round in basis points.
     uint256 public constant LOSER_APPEAL_PERIOD_MULTIPLIER = 5000; // Multiplier of the appeal period for losers (any other ruling options) in basis points. The loser is given less time to fund its appeal to defend against last minute appeal funding attacks.
     uint256 public constant MULTIPLIER_DENOMINATOR = 10000; // Denominator for multipliers.
-    uint256 private constant NUMBER_OF_RULING_OPTIONS = type(uint256).max; // The amount of non 0 choices the arbitrator can give. The uint256(-1) number of choices can not be used in the current Kleros Court implementation.
+    uint256 private constant NUMBER_OF_RULING_OPTIONS = type(uint256).max; // The amount of non 0 choices the arbitrator can give.
 
     enum Status {
         None, // The question hasn't been requested arbitration yet.
@@ -130,7 +130,6 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
      */
     function rule(uint256 _disputeID, uint256 _ruling) public override {
         require(IArbitrator(msg.sender) == arbitrator, "Only arbitrator allowed");
-        require(_ruling <= NUMBER_OF_RULING_OPTIONS, "Invalid ruling");
 
         uint256 questionID = externalIDtoLocalID[_disputeID];
         ArbitrationRequest storage arbitrationRequest = arbitrationRequests[questionID];
@@ -156,7 +155,6 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
      *  @return fullyFunded True if the ruling option got fully funded as a result of this contribution.
      */
     function fundAppeal(uint256 _questionID, uint256 _ruling) external payable override returns (bool fullyFunded) {
-        require(_ruling <= NUMBER_OF_RULING_OPTIONS, "Answer is out of bounds");
         ArbitrationRequest storage arbitrationRequest = arbitrationRequests[_questionID];
         require(arbitrationRequest.status == Status.Disputed, "No dispute to appeal.");
 
