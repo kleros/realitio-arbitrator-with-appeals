@@ -13,7 +13,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId, getUnnamedA
     title: "A Realitio Question",
     description: "A Realitio question has been raised to arbitration.",
     question: "Give an answer to the question.",
-    evidenceDisplayInterfaceURI: "/ipfs/QmQTnGNbRFpsS8zevPZTZA2ZioBKWM6u1HVCf9vLWkRuEH/index.html",
+    evidenceDisplayInterfaceURI: "/ipfs/QmRi5wNMmg41LSnaoWj9YZtj13ccQ6ESXRHjRGa4thvqe1/index.html",
     dynamicScriptURI: "/ipfs/QmNRusunzT9UDpyh67uV7V6AY7KAVeWMpXbW9RH3ax8XLu/bundle.js",
   };
   const ipfsHashMetaEvidenceObj = await ipfsPublish("metaEvidence.json", new TextEncoder().encode(JSON.stringify(metaevidence)));
