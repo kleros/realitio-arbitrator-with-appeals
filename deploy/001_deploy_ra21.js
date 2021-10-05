@@ -23,8 +23,8 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId, getUnnamedA
     title: "A Realitio Question",
     description: "A Realitio question has been raised to arbitration.",
     question: "Give an answer to the question.",
-    evidenceDisplayInterfaceURI: "/ipfs/QmYdGSdeAj3oVdPKuxPAe9QnfpSVxJ2tz6mXq14ajv2CiD/index.html",
-    dynamicScriptURI: "/ipfs/QmPF48Zqfd7JqoZai89aHDMRe1Q9H98p97esostSKtATYP/bundle.js",
+    evidenceDisplayInterfaceURI: "/ipfs/QmWCmzMB4zbzii8HV9HFGa8Evgt5i63GyveJtw2umxRrcX/reality-evidence-display-4/index.html",
+    dynamicScriptURI: "/ipfs/QmWWsDmvjhR9UVRgkcG75vAKzfK3vB85EkZzudnaxwfAWr/bundle.js",
     fileURI: "/ipfs/Qme4jcJfBwXZ4j5fUcL9dwuWXkvFcJcZ7B6fRfwEsLoM5X/RealitioSafesnapPrimaryDoc.pdf",
   };
   const ipfsHashMetaEvidenceObj = await ipfsPublish("metaEvidence.json", new TextEncoder().encode(JSON.stringify(metaevidence)));
@@ -42,10 +42,6 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId, getUnnamedA
   const deployer = accounts[0];
   const contractName = "Realitio_v2_1_ArbitratorWithAppeals";
 
-  // const deployAddress = await hre.run("compute-contract-address", {
-  //   account: deployer,
-  // });
-
   const ra21 = deploy(contractName, {
     from: deployer,
     gasLimit: 4000000,
@@ -61,7 +57,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId, getUnnamedA
   console.log(`Going to try verifying the source code on Etherscan in ${sleepDuration / 1000} seconds.`);
 
   await new Promise((resolve) => setTimeout(resolve, sleepDuration));
-
+  console.log("Trying to verify now.");
   await hre.run("verify:verify", {
     address: deployment.address,
     constructorArguments: deployment.args,
