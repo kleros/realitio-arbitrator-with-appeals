@@ -3,6 +3,8 @@ const fetch = require("node-fetch");
 
 module.exports = async ({ getNamedAccounts, deployments, getChainId, getUnnamedAccounts, ethers, config }) => {
   // INFURA_PROJECT_ID, PRIVATE_KEY and ETHERSCAN environment variables are required for this task. See Hardhat configuation for more information.
+  const chainId = await getChainId();
+
   const KLEROS = { 1: "0x988b3A538b618C7A603e1c11Ab82Cd16dbE28069", 42: "0x60B2AbfDfaD9c0873242f59f2A8c32A3Cc682f80" };
   const REALITIOv21 = { 42: "0x50E35A1ED424aB9C0B8C7095b3d9eC2fb791A168" };
   const REALITIOv30 = { 1: "0x5b7dD1E86623548AF054A4985F7fc8Ccbb554E2c", 42: "0xcB71745d032E16ec838430731282ff6c10D29Dea" };
@@ -28,6 +30,10 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId, getUnnamedA
     evidenceDisplayInterfaceURI: "/ipfs/QmWCmzMB4zbzii8HV9HFGa8Evgt5i63GyveJtw2umxRrcX/reality-evidence-display-4/index.html",
     dynamicScriptURI: "/ipfs/QmWWsDmvjhR9UVRgkcG75vAKzfK3vB85EkZzudnaxwfAWr/bundle.js",
     fileURI: `/ipfs/${primaryDocumentIPFSPath}`,
+    arbitrableChainID: chainId,
+    arbitratorChainID: chainId,
+    dynamicScriptRequiredParams: ["arbitrableChainID", "arbitrableJsonRpcUrl", "arbitrableContractAddress"],
+    evidenceDisplayInterfaceRequiredParams: ["arbitrableChainID", "arbitrableJsonRpcUrl", "arbitrableContractAddress"],
   };
   const ipfsHashMetaEvidenceObj = await ipfsPublish("metaEvidence.json", new TextEncoder().encode(JSON.stringify(metaevidence)));
   const metaevidenceURI = `/ipfs/${ipfsHashMetaEvidenceObj[1].hash}${ipfsHashMetaEvidenceObj[0].path}`;
@@ -39,7 +45,6 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId, getUnnamedA
     42: config.networks.kovan,
     1: config.networks.main,
   };
-  const chainId = await getChainId();
   const web3provider = new providers.JsonRpcProvider(networks[chainId]);
   const accounts = await getUnnamedAccounts();
   const deployer = accounts[0];
