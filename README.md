@@ -55,25 +55,18 @@ A [Realitio](https://github.com/RealityETH/monorepo/blob/main/packages/contracts
 
 ### Deploy
 
-Contract requires metaevidence during construction and metaevidence needs to know deployed contract address up-front, so it needs to be precomputed.
+Here is an example deployment command: 
 
-For dynamic script, see here: https://github.com/kleros/realitio-script
+`ETHERSCAN=W1VIXXXXXXHTHTIS INFURA_PROJECT_ID=b0XXXXXX6802 PRIVATE_KEY=1XXXX0b80 npx hardhat deploy --network kovan  --reset --gasprice 70000000000`
 
-Reusable evidenceDisplayInterfaceURI: `/ipfs/QmQTnGNbRFpsS8zevPZTZA2ZioBKWM6u1HVCf9vLWkRuEH/index.html` You can just use this value for generating a new metaevidence, unless you want a new display interface.
-
-Example metaevidence:
-
-```
-{
-  "category": "Oracle",
-  "title": "Realitio Question",
-  "description": "A Realitio question has been raised to arbitration.",
-  "question": "Give an answer to the question.",
-  "evidenceDisplayInterfaceURI": "/ipfs/QmQTnGNbRFpsS8zevPZTZA2ZioBKWM6u1HVCf9vLWkRuEH/index.html",
-  "dynamicScriptURI": "/ipfs/QmSG1jvoScL99YSyzkSArd8w31moiW4BheUXvJNfPneduC/bundle.js"
-}
-```
-
-After completing these for the [migration script](https://github.com/kleros/realitio-arbitrator-with-appeals/blob/master/migrations/2_deploy_ra.js), finally, this command will deploy and verify source code: `INFURA_PROJECT_ID=$INFURA_PROJECT_ID PRIVATE_KEY=$PRIVATE_KEY_OF_DEPLOYING_ACC ETHERSCAN=$ETHERSCAN_API_KEY yarn run hardhat deploy --network $NETWORK_NAME
 
 Deployment script will automatically verify the source code.
+
+### Live instances:
+
+General Purpose Arbitrator (General Court, 31 votes): 
+- https://etherscan.io/address/0x728cba71a3723caab33ea416cb46e2cc9215a596
+- https://kovan.etherscan.io/address/0x99489d7bb33539f3d1a401741e56e8f02b9ae0cf#readContract
+
+DAO Governance Arbitrator (Techical Court, 5 votes):
+- https://etherscan.io/tx/0x3b965785fd408ad4c268af1f2d2d48271d0d5b3a0c35d873f92b5b47c9dd74db
