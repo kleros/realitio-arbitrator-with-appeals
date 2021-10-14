@@ -10,9 +10,9 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId, getUnnamedA
 
   const chainId = await getChainId();
 
-  const KLEROS = { 1: "0x988b3A538b618C7A603e1c11Ab82Cd16dbE28069", 42: "0x60B2AbfDfaD9c0873242f59f2A8c32A3Cc682f80" };
+  const KLEROS = { 1: "0x988b3A538b618C7A603e1c11Ab82Cd16dbE28069", 4: "0x6e376E049BD375b53d31AFDc21415AeD360C1E70", 42: "0x60B2AbfDfaD9c0873242f59f2A8c32A3Cc682f80" };
   const REALITIOv21 = { 42: "0x50E35A1ED424aB9C0B8C7095b3d9eC2fb791A168" };
-  const REALITIOv30 = { 1: "0x5b7dD1E86623548AF054A4985F7fc8Ccbb554E2c", 42: "0xcB71745d032E16ec838430731282ff6c10D29Dea" };
+  const REALITIOv30 = { 1: "0x5b7dD1E86623548AF054A4985F7fc8Ccbb554E2c", 4: "0xDf33060F476F8cff7511F806C72719394da1Ad64", 42: "0xcB71745d032E16ec838430731282ff6c10D29Dea" };
 
   const primaryDocumentIPFSPath = "QmaUr6hnSVxYD899xdcn2GUVtXVjXoSXKZbce3zFtGWw4H/Question_Resolution_Policy.pdf";
   const templateHashes = [
