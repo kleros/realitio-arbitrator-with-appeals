@@ -64,10 +64,10 @@ Deployment script will automatically verify the source code.
 
 ### Live instances:
 
-General Purpose Arbitrator (General Court, 31 votes, Primary Document: https://ipfs.kleros.io/ipfs/QmaUr6hnSVxYD899xdcn2GUVtXVjXoSXKZbce3zFtGWw4H/Question_Resolution_Policy.pdf): 
+General Purpose Arbitrator (General Court, 31 votes, [Primary Document](https://ipfs.kleros.io/ipfs/QmaUr6hnSVxYD899xdcn2GUVtXVjXoSXKZbce3zFtGWw4H/Question_Resolution_Policy.pdf)) 
 - https://etherscan.io/address/0x728cba71a3723caab33ea416cb46e2cc9215a596#code
 - https://kovan.etherscan.io/address/0x99489d7bb33539f3d1a401741e56e8f02b9ae0cf#code
 - https://rinkeby.etherscan.io/address/0xe27768bdb76a9b742b7ddcfe1539fadaf3b89bc7#code
 
-DAO Governance Arbitrator (Techical Court, 5 votes, Primary Document: https://ipfs.kleros.io/ipfs/QmXyo9M4Z2XY6Nw9UfuuUNzKXXNhvt24q6pejuN9RYWPMr/Reality_Module_Governance_Oracle-Question_Resolution_Policy.pdf):
+DAO Governance Arbitrator (Techical Court, 5 votes, [Primary Document](https://ipfs.kleros.io/ipfs/QmXyo9M4Z2XY6Nw9UfuuUNzKXXNhvt24q6pejuN9RYWPMr/Reality_Module_Governance_Oracle-Question_Resolution_Policy.pdf)) 
 - https://etherscan.io/tx/0x3b965785fd408ad4c268af1f2d2d48271d0d5b3a0c35d873f92b5b47c9dd74db#code
