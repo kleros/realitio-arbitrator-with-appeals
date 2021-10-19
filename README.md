@@ -70,9 +70,9 @@ General Purpose Arbitrator (Subcourt 0, 31 votes, [Primary Document](https://ipf
 - https://rinkeby.etherscan.io/address/0xe27768bdb76a9b742b7ddcfe1539fadaf3b89bc7#code
 
 DAO Governance Arbitrator (Subcourt 4, 5 votes, [Primary Document](https://ipfs.kleros.io/ipfs/QmXyo9M4Z2XY6Nw9UfuuUNzKXXNhvt24q6pejuN9RYWPMr/Reality_Module_Governance_Oracle-Question_Resolution_Policy.pdf)) 
-- https://etherscan.io/tx/0x3b965785fd408ad4c268af1f2d2d48271d0d5b3a0c35d873f92b5b47c9dd74db#code
+- https://etherscan.io/address/0xf72cfd1b34a91a64f9a98537fe63fbab7530adca#code
 
 DAO Governance Arbitrator (Subcourt 2, 1 vote, [Primary Document](https://ipfs.kleros.io/ipfs/QmXyo9M4Z2XY6Nw9UfuuUNzKXXNhvt24q6pejuN9RYWPMr/Reality_Module_Governance_Oracle-Question_Resolution_Policy.pdf)) 
-- https://kovan.etherscan.io/address/0xb9fdd2904cbcc5543F02DB948B2CE59Ef10A950E#readContract
+- https://kovan.etherscan.io/address/0xb9fdd2904cbcc5543F02DB948B2CE59Ef10A950E#code
 
 
