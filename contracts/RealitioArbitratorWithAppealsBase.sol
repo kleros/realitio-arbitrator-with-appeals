@@ -2,7 +2,7 @@
 
 /**
  *  @authors: [@ferittuncer]
- *  @reviewers: [@unknownunknown1, @hbarcelos*, @MerlinEgalite*, @shalzz, @fnanni-0*, @clesaege*, @jaybuidl]
+ *  @reviewers: [@unknownunknown1, @hbarcelos*, @MerlinEgalite*, @shalzz, @fnanni-0*, @clesaege*, @jaybuidl, @orlandothefraser]
  *  @auditors: []
  *  @bounties: []
  */
@@ -265,7 +265,7 @@ abstract contract RealitioArbitratorWithAppealsBase is IDisputeResolver, IRealit
         }
     }
 
-    /** @dev Allows to withdraw any reimbursable fees or rewards after the dispute gets solved.
+    /** @dev Allows to withdraw any reimbursable fees or rewards after the dispute gets resolved.
      *  @param _questionID Identifier of the Realitio question, casted to uint. This also serves as the local identifier in this contract.
      *  @param _contributor The address whose rewards to withdraw.
      *  @param _roundNumber The number of the round caller wants to withdraw from.
