@@ -24,7 +24,7 @@
     "@kleros/ethereum-libraries": "7.0.1",
     "@realitio/realitio-contracts": "2.2.8",
     "@reality.eth/reality-eth-lib": "^3.0.0",
-    "node-fetch": "^2.0.0"
+    "node-fetch": "^2.6.7"
   },
   "scripts": {
     "compile": "hardhat compile",
